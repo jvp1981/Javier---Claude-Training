@@ -50,6 +50,13 @@
             color: #666;
         }
 
+        .api-source {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         .price-container {
             margin: 30px 0;
         }
@@ -166,6 +173,29 @@
             background: #fee2e2;
             border-radius: 10px;
             margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        .status-active {
+            background: #10b981;
+        }
+
+        .status-error {
+            background: #ef4444;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         @media (max-width: 480px) {
@@ -200,40 +230,118 @@
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
             const [lastUpdate, setLastUpdate] = useState(null);
+            const [apiSource, setApiSource] = useState('');
+            const [connectionStatus, setConnectionStatus] = useState('connecting');
 
+            // Múltiples APIs como fallback
             const fetchBTCPrice = async () => {
+                // API 1: Binance (más rápida y confiable)
+                try {
+                    const binanceResponse = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+                    if (binanceResponse.ok) {
+                        const data = await binanceResponse.json();
+                        const currentPrice = parseFloat(data.lastPrice);
+                        const change24h = parseFloat(data.priceChangePercent);
+                        const volume24h = parseFloat(data.volume) * currentPrice;
+
+                        updatePriceData(currentPrice, change24h, volume24h, null);
+                        setApiSource('Binance API');
+                        setConnectionStatus('active');
+                        setError(null);
+                        return;
+                    }
+                } catch (err) {
+                    console.log('Binance API falló, intentando con Coinbase...');
+                }
+
+                // API 2: Coinbase
+                try {
+                    const coinbaseResponse = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot');
+                    if (coinbaseResponse.ok) {
+                        const data = await coinbaseResponse.json();
+                        const currentPrice = parseFloat(data.data.amount);
+                        
+                        // Obtener datos adicionales de CoinGecko si es posible
+                        try {
+                            const geckoResponse = await fetch(
+                                'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true'
+                            );
+                            if (geckoResponse.ok) {
+                                const geckoData = await geckoResponse.json();
+                                updatePriceData(
+                                    currentPrice,
+                                    geckoData.bitcoin.usd_24h_change,
+                                    geckoData.bitcoin.usd_24h_vol,
+                                    geckoData.bitcoin.usd_market_cap
+                                );
+                                setApiSource('Coinbase + CoinGecko');
+                            } else {
+                                updatePriceData(currentPrice, 0, 0, null);
+                                setApiSource('Coinbase API');
+                            }
+                        } catch {
+                            updatePriceData(currentPrice, 0, 0, null);
+                            setApiSource('Coinbase API');
+                        }
+                        
+                        setConnectionStatus('active');
+                        setError(null);
+                        return;
+                    }
+                } catch (err) {
+                    console.log('Coinbase API falló, intentando con CoinGecko...');
+                }
+
+                // API 3: CoinGecko (fallback final)
                 try {
                     const response = await fetch(
                         'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true'
                     );
                     
-                    if (!response.ok) {
-                        throw new Error('Error al obtener datos');
+                    if (response.ok) {
+                        const data = await response.json();
+                        const currentPrice = data.bitcoin.usd;
+                        updatePriceData(
+                            currentPrice,
+                            data.bitcoin.usd_24h_change,
+                            data.bitcoin.usd_24h_vol,
+                            data.bitcoin.usd_market_cap
+                        );
+                        setApiSource('CoinGecko API');
+                        setConnectionStatus('active');
+                        setError(null);
+                        return;
                     }
-
-                    const data = await response.json();
-                    const currentPrice = data.bitcoin.usd;
-
-                    // Determinar tendencia
-                    if (previousPrice !== null) {
-                        if (currentPrice > previousPrice) {
-                            setTrend('up');
-                        } else if (currentPrice < previousPrice) {
-                            setTrend('down');
-                        } else {
-                            setTrend('neutral');
-                        }
-                    }
-
-                    setPreviousPrice(currentPrice);
-                    setPriceData(data.bitcoin);
-                    setLastUpdate(new Date());
-                    setLoading(false);
-                    setError(null);
                 } catch (err) {
-                    setError('No se pudo conectar con la API. Reintentando...');
-                    console.error('Error:', err);
+                    console.error('Todas las APIs fallaron:', err);
                 }
+
+                // Si todas las APIs fallan
+                setConnectionStatus('error');
+                setError('No se pudo conectar con ninguna API. Verificando conexión...');
+            };
+
+            const updatePriceData = (currentPrice, change24h, volume24h, marketCap) => {
+                // Determinar tendencia
+                if (previousPrice !== null) {
+                    if (currentPrice > previousPrice) {
+                        setTrend('up');
+                    } else if (currentPrice < previousPrice) {
+                        setTrend('down');
+                    } else {
+                        setTrend('neutral');
+                    }
+                }
+
+                setPreviousPrice(currentPrice);
+                setPriceData({
+                    usd: currentPrice,
+                    usd_24h_change: change24h,
+                    usd_24h_vol: volume24h,
+                    usd_market_cap: marketCap
+                });
+                setLastUpdate(new Date());
+                setLoading(false);
             };
 
             useEffect(() => {
@@ -256,6 +364,7 @@
             };
 
             const formatNumber = (num) => {
+                if (!num) return 'N/A';
                 return new Intl.NumberFormat('es-ES', {
                     notation: 'compact',
                     compactDisplay: 'short'
@@ -279,6 +388,7 @@
             };
 
             const getChangeClass = (change) => {
+                if (!change) return 'change-neutral';
                 if (change > 0) return 'change-positive';
                 if (change < 0) return 'change-negative';
                 return 'change-neutral';
@@ -287,7 +397,12 @@
             if (loading && !priceData) {
                 return (
                     <div className="container">
-                        <div className="loading">Cargando datos de Bitcoin...</div>
+                        <div className="loading">
+                            <div>Conectando con APIs de criptomonedas...</div>
+                            <div style={{marginTop: '10px', fontSize: '12px', color: '#9ca3af'}}>
+                                Probando: Binance → Coinbase → CoinGecko
+                            </div>
+                        </div>
                     </div>
                 );
             }
@@ -296,7 +411,13 @@
                 <div className="container">
                     <div className="header">
                         <h1 className="title">Bitcoin Tracker</h1>
-                        <p className="subtitle">Precio en tiempo real BTC/USD</p>
+                        <p className="subtitle">
+                            <span className={`status-indicator status-${connectionStatus}`}></span>
+                            Precio en tiempo real BTC/USD
+                        </p>
+                        {apiSource && (
+                            <p className="api-source">Fuente: {apiSource}</p>
+                        )}
                     </div>
 
                     {error && <div className="error">{error}</div>}
@@ -312,26 +433,32 @@
                                     </span>
                                 </div>
                                 
-                                <div className={`change-24h ${getChangeClass(priceData.usd_24h_change)}`}>
-                                    {priceData.usd_24h_change > 0 ? '+' : ''}
-                                    {priceData.usd_24h_change.toFixed(2)}% (24h)
-                                </div>
+                                {priceData.usd_24h_change !== undefined && priceData.usd_24h_change !== 0 && (
+                                    <div className={`change-24h ${getChangeClass(priceData.usd_24h_change)}`}>
+                                        {priceData.usd_24h_change > 0 ? '+' : ''}
+                                        {priceData.usd_24h_change.toFixed(2)}% (24h)
+                                    </div>
+                                )}
                             </div>
 
                             <div className="info-grid">
                                 <div className="info-item">
                                     <div className="info-label">Market Cap</div>
-                                    <div className="info-value">${formatNumber(priceData.usd_market_cap)}</div>
+                                    <div className="info-value">{formatNumber(priceData.usd_market_cap)}</div>
                                 </div>
                                 <div className="info-item">
                                     <div className="info-label">Volumen 24h</div>
-                                    <div className="info-value">${formatNumber(priceData.usd_24h_vol)}</div>
+                                    <div className="info-value">{formatNumber(priceData.usd_24h_vol)}</div>
                                 </div>
                             </div>
 
                             {lastUpdate && (
                                 <div className="last-update">
                                     Última actualización: {lastUpdate.toLocaleTimeString('es-ES')}
+                                    <br/>
+                                    <span style={{fontSize: '10px'}}>
+                                        Actualización automática cada 10 segundos
+                                    </span>
                                 </div>
                             )}
                         </>
