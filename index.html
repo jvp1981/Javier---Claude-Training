@@ -11,643 +11,224 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg: #080c10;
-            --surface: #0d1117;
-            --surface2: #161b22;
-            --surface3: #21262d;
+            --bg: #080c10; --surface: #0d1117; --surface2: #161b22; --surface3: #21262d;
             --border: rgba(255,255,255,0.07);
-            --accent: #f7931a;
-            --accent-dim: rgba(247,147,26,0.15);
-            --accent-glow: rgba(247,147,26,0.4);
-            --green: #3fb950;
-            --green-dim: rgba(63,185,80,0.12);
-            --red: #f85149;
-            --red-dim: rgba(248,81,73,0.12);
-            --text: #e6edf3;
-            --text-muted: #7d8590;
-            --text-dim: #484f58;
-            --chf: #29b6f6;
-            --chf-dim: rgba(41,182,246,0.12);
+            --accent: #f7931a; --accent-dim: rgba(247,147,26,0.15); --accent-glow: rgba(247,147,26,0.4);
+            --green: #3fb950; --green-dim: rgba(63,185,80,0.12);
+            --red: #f85149; --red-dim: rgba(248,81,73,0.12);
+            --yellow: #e3b341; --yellow-dim: rgba(227,179,65,0.12);
+            --text: #e6edf3; --text-muted: #7d8590; --text-dim: #484f58;
+            --chf: #29b6f6; --chf-dim: rgba(41,182,246,0.12);
         }
+        @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+        @keyframes glow-orange { 0%,100%{box-shadow:0 0 20px var(--accent-glow)} 50%{box-shadow:0 0 50px var(--accent-glow),0 0 100px rgba(247,147,26,0.2)} }
+        @keyframes pricePop { 0%{transform:scale(1)} 40%{transform:scale(1.04)} 100%{transform:scale(1)} }
+        @keyframes spin  { to{transform:rotate(360deg)} }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scanline {
-            0%   { transform: translateY(-100%); }
-            100% { transform: translateY(100vh); }
-        }
-        @keyframes glow-orange {
-            0%,100% { box-shadow: 0 0 20px var(--accent-glow); }
-            50%      { box-shadow: 0 0 50px var(--accent-glow), 0 0 100px rgba(247,147,26,0.2); }
-        }
-        @keyframes pricePop {
-            0%   { transform: scale(1); }
-            40%  { transform: scale(1.04); }
-            100% { transform: scale(1); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @keyframes blink {
-            0%,100% { opacity:1; }
-            50%      { opacity:0.3; }
-        }
+        body { font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:30px 20px 60px;position:relative;overflow-x:hidden; }
+        body::before { content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(247,147,26,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0; }
+        body::after  { content:'';position:fixed;left:0;right:0;height:3px;background:linear-gradient(transparent,rgba(247,147,26,0.08),transparent);animation:scanline 8s linear infinite;pointer-events:none;z-index:0; }
 
-        body {
-            font-family: 'Syne', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 30px 20px 60px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* subtle grid bg */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(247,147,26,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(247,147,26,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* scanline sweep */
-        body::after {
-            content: '';
-            position: fixed;
-            left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(transparent, rgba(247,147,26,0.08), transparent);
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 680px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-            animation: fadeUp 0.5s ease-out;
-        }
+        .container { max-width:680px;width:100%;position:relative;z-index:1;animation:fadeUp 0.5s ease-out; }
 
         /* ── HEADER ── */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .btc-badge {
-            width: 48px; height: 48px;
-            background: var(--accent-dim);
-            border: 1px solid rgba(247,147,26,0.3);
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            animation: glow-orange 3s ease-in-out infinite;
-        }
-        .header-title {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text);
-        }
-        .header-sub {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-            letter-spacing: 1px;
-        }
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--green);
-            background: var(--green-dim);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(63,185,80,0.2);
-        }
-        .live-dot {
-            width: 6px; height: 6px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: blink 1.5s ease-in-out infinite;
-        }
+        .header { display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border); }
+        .header-left { display:flex;align-items:center;gap:14px; }
+        .btc-badge { width:48px;height:48px;background:var(--accent-dim);border:1px solid rgba(247,147,26,0.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;animation:glow-orange 3s ease-in-out infinite; }
+        .header-title { font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text); }
+        .header-sub { font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;letter-spacing:1px; }
+        .live-badge { display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);background:var(--green-dim);padding:6px 12px;border-radius:20px;border:1px solid rgba(63,185,80,0.2); }
+        .live-dot { width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite; }
 
-        /* ── PRICE ROW ── */
-        .price-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        .price-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0.6;
-        }
-        .price-row {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        .price-usd-block {}
-        .price-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 1.5px;
-            margin-bottom: 6px;
-        }
-        .price-usd {
-            font-family: 'Space Mono', monospace;
-            font-size: 54px;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -2px;
-            line-height: 1;
-            transition: color 0.3s;
-        }
-        .price-usd.pop {
-            animation: pricePop 0.4s ease-out;
-        }
-        .price-usd.up   { color: var(--green); }
-        .price-usd.down { color: var(--red); }
+        /* ── PRICE ── */
+        .price-section { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;position:relative;overflow:hidden; }
+        .price-section::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.6; }
+        .price-row { display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px; }
+        .price-label { font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:1.5px;margin-bottom:6px; }
+        .price-usd { font-family:'Space Mono',monospace;font-size:54px;font-weight:700;color:var(--text);letter-spacing:-2px;line-height:1;transition:color 0.3s; }
+        .price-usd.pop  { animation:pricePop 0.4s ease-out; }
+        .price-usd.up   { color:var(--green); }
+        .price-usd.down { color:var(--red); }
+        .price-chf-block { text-align:right; }
+        .price-chf { font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--chf);letter-spacing:-1px;line-height:1; }
+        .chf-rate-note { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:4px; }
+        .change-row { display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
+        .change-pill { display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px; }
+        .change-pill.pos { background:var(--green-dim);color:var(--green);border:1px solid rgba(63,185,80,0.25); }
+        .change-pill.neg { background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,0.25); }
+        .change-pill.neu { background:var(--surface2);color:var(--text-muted);border:1px solid var(--border); }
+        .sparkline-row { display:flex;align-items:center;gap:8px;margin-top:14px; }
+        .sparkline-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);white-space:nowrap; }
 
-        .price-chf-block {
-            text-align: right;
-        }
-        .price-chf {
-            font-family: 'Space Mono', monospace;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--chf);
-            letter-spacing: -1px;
-            line-height: 1;
-        }
-        .chf-rate-note {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            margin-top: 4px;
-        }
+        /* ── 24H HIGH/LOW ── */
+        .currency-strip { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px; }
+        .currency-card { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden; }
+        .currency-card.usd-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.5; }
+        .currency-card.chf-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--chf);opacity:0.5; }
+        .currency-icon { font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:8px; }
+        .currency-card.usd-card .currency-icon { color:var(--accent); }
+        .currency-card.chf-card .currency-icon { color:var(--chf); }
+        .currency-value { font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px; }
+        .currency-sub { font-size:11px;color:var(--text-muted);margin-top:4px; }
 
-        .change-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .change-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 8px;
-        }
-        .change-pill.pos { background: var(--green-dim); color: var(--green); border: 1px solid rgba(63,185,80,0.25); }
-        .change-pill.neg { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(248,81,73,0.25); }
-        .change-pill.neu { background: var(--surface2);  color: var(--text-muted); border: 1px solid var(--border); }
+        /* ── STATS ── */
+        .stats-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px; }
+        @media(max-width:560px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
+        .stat-card { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px; }
+        .stat-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.8px;margin-bottom:6px; }
+        .stat-value { font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--text); }
 
-        .trend-arrow {
-            font-size: 18px;
-        }
+        /* ── INDICATORS ── */
+        .indicators-row { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px; }
+        @media(max-width:560px){ .indicators-row{grid-template-columns:1fr;} }
+        .indicator-card { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden; }
+        .indicator-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:10px; }
+        .indicator-main { display:flex;align-items:center;gap:12px; }
+        .indicator-score { font-family:'Space Mono',monospace;font-size:34px;font-weight:700;line-height:1; }
+        .indicator-name { font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px; }
+        .indicator-sub  { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted); }
+        .fg-extreme-fear  { color:#f85149; } .fg-fear { color:#f97316; } .fg-neutral { color:#e3b341; }
+        .fg-greed { color:#3fb950; } .fg-extreme-greed { color:#22c55e; }
+        .mayer-low { color:#3fb950; } .mayer-normal { color:#e3b341; } .mayer-high { color:#f85149; }
+        .semaphore { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+        .sem-green  { background:var(--green); box-shadow:0 0 8px var(--green); }
+        .sem-yellow { background:var(--yellow);box-shadow:0 0 8px var(--yellow); }
+        .sem-red    { background:var(--red);   box-shadow:0 0 8px var(--red); }
+        .fg-bar-wrap { margin-top:12px; }
+        .fg-bar-track { height:4px;background:var(--surface3);border-radius:2px;overflow:hidden; }
+        .fg-bar-fill  { height:100%;border-radius:2px;transition:width 0.6s ease; }
 
-        /* ── DUAL CURRENCY MINI CARDS ── */
-        .currency-strip {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .currency-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        .currency-card.usd-card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background: var(--accent); opacity:0.5; }
-        .currency-card.chf-card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background: var(--chf);   opacity:0.5; }
-        .currency-icon {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        .currency-card.usd-card .currency-icon { color: var(--accent); }
-        .currency-card.chf-card .currency-icon { color: var(--chf); }
-        .currency-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.5px;
-        }
-        .currency-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
+        /* ── PORTFOLIO ── */
+        .portfolio-section { background:var(--surface);border:1px solid rgba(247,147,26,0.25);border-radius:20px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden; }
+        .portfolio-section::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--chf),transparent);opacity:0.7; }
+        .portfolio-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+        .portfolio-title { font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px; }
+        .portfolio-title::before { content:'◈';color:var(--accent);font-size:16px; }
+        .btc-input-wrap { display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;transition:border-color 0.2s; }
+        .btc-input-wrap:focus-within { border-color:rgba(247,147,26,0.5); }
+        .btc-input-label { font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);font-weight:700; }
+        .btc-input { background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--text);width:90px;text-align:right; }
+        .btc-input::placeholder { color:var(--text-dim); }
+        .portfolio-values { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+        @media(max-width:560px){ .portfolio-values{grid-template-columns:1fr;} }
+        .portfolio-val-card { background:var(--surface2);border-radius:12px;padding:16px 18px;border:1px solid var(--border); }
+        .portfolio-val-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px; }
+        .portfolio-val-amount { font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:-0.5px; }
+        .portfolio-val-card.chf-val .portfolio-val-amount { color:var(--chf); }
+        .portfolio-val-card.usd-val .portfolio-val-amount { color:var(--accent); }
+        .portfolio-val-sub { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:4px; }
+        .portfolio-empty { font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);text-align:center;padding:8px 0 4px; }
 
-        /* ── STATS GRID ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        @media (max-width: 560px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-        }
-        .stat-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
-        }
-        .stat-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-        }
+        /* ── DCA ── */
+        .dca-section { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin-bottom:16px; }
+        .dca-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
+        .dca-title { font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px; }
+        .dca-title::before { content:'⬇';color:var(--chf);font-size:14px; }
+        .dca-subtitle { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted); }
+        .dca-levels { display:flex;flex-direction:column;gap:8px; }
+        .dca-level { display:grid;grid-template-columns:90px 1fr 70px 80px;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border); }
+        .dca-level.reached { border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.05); }
+        @media(max-width:560px){ .dca-level{grid-template-columns:80px 1fr 60px;} .dca-action{display:none;} }
+        .dca-price-tag { font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--chf); }
+        .dca-bar-track { height:4px;background:var(--surface3);border-radius:2px;overflow:hidden; }
+        .dca-bar-fill  { height:100%;border-radius:2px;background:linear-gradient(90deg,var(--chf),var(--green));transition:width 0.8s ease; }
+        .dca-pct    { font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-align:right; }
+        .dca-action { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-align:right; }
+        .dca-level.reached .dca-action { color:var(--green); }
 
-        /* ── CHART SECTION ── */
-        .chart-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-        .chart-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .chart-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-        }
-        .chart-title span {
-            color: var(--text-muted);
-            font-weight: 400;
-            font-size: 12px;
-            margin-left: 6px;
-        }
-        .timeframe-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--surface2);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-        .tab-btn {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 5px 12px;
-            border-radius: 7px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: transparent;
-            color: var(--text-muted);
-        }
-        .tab-btn.active {
-            background: var(--accent);
-            color: #000;
-        }
-        .tab-btn:hover:not(.active) {
-            background: var(--surface3);
-            color: var(--text);
-        }
-        .chart-wrapper {
-            position: relative;
-            height: 220px;
-        }
-        .chart-loading {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            color: var(--text-muted);
-            gap: 10px;
-        }
-        .mini-spinner {
-            width: 18px; height: 18px;
-            border: 2px solid var(--surface3);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        /* ── CHART ── */
+        .chart-section { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px; }
+        .chart-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px; }
+        .chart-title { font-size:14px;font-weight:700;color:var(--text); }
+        .chart-title span { color:var(--text-muted);font-weight:400;font-size:12px;margin-left:6px; }
+        .chart-header-right { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+        .timeframe-tabs { display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:10px;border:1px solid var(--border); }
+        .tab-btn { font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:5px 10px;border-radius:7px;border:none;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text-muted); }
+        .tab-btn.active     { background:var(--accent);color:#000; }
+        .tab-btn.active.chf { background:var(--chf);color:#000; }
+        .tab-btn:hover:not(.active) { background:var(--surface3);color:var(--text); }
+        .chart-wrapper { position:relative;height:240px; }
+        .chart-loading { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);gap:10px; }
+        .chart-hint { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px; }
+        .mini-spinner { width:18px;height:18px;border:2px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
 
-        /* ── PORTFOLIO CARD ── */
-        .portfolio-section {
-            background: var(--surface);
-            border: 1px solid rgba(247,147,26,0.25);
-            border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        .portfolio-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), var(--chf), transparent);
-            opacity: 0.7;
-        }
-        .portfolio-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .portfolio-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .portfolio-title::before {
-            content: '◈';
-            color: var(--accent);
-            font-size: 16px;
-        }
-        .btc-input-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 6px 12px;
-            transition: border-color 0.2s;
-        }
-        .btc-input-wrap:focus-within {
-            border-color: rgba(247,147,26,0.5);
-        }
-        .btc-input-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--accent);
-            font-weight: 700;
-        }
-        .btc-input {
-            background: transparent;
-            border: none;
-            outline: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-            width: 90px;
-            text-align: right;
-        }
-        .btc-input::placeholder { color: var(--text-dim); }
-        .portfolio-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .portfolio-val-card {
-            background: var(--surface2);
-            border-radius: 12px;
-            padding: 16px 18px;
-            border: 1px solid var(--border);
-        }
-        .portfolio-val-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-        .portfolio-val-amount {
-            font-family: 'Space Mono', monospace;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        .portfolio-val-card.chf-val .portfolio-val-amount { color: var(--chf); }
-        .portfolio-val-card.usd-val .portfolio-val-amount { color: var(--accent); }
-        .portfolio-val-sub {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            margin-top: 4px;
-        }
-        .portfolio-empty {
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            color: var(--text-dim);
-            text-align: center;
-            padding: 8px 0 4px;
-        }
+        /* ── FOOTER ── */
+        .footer-bar { display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:14px; }
+        .update-info { display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted); }
+        .countdown-wrap { display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted); }
+        .countdown-circle { width:34px;height:34px;position:relative; }
+        .countdown-svg { transform:rotate(-90deg); }
+        .cc-bg   { fill:none;stroke:var(--surface3);stroke-width:3; }
+        .cc-prog { fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 1s linear; }
+        .cc-text { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:var(--accent);font-family:'Space Mono',monospace; }
 
-        /* ── SPARKLINE ── */
-        .sparkline-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 14px;
-        }
-        .sparkline-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            white-space: nowrap;
-        }
-
-        /* ── COUNTDOWN ── */
-        .footer-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-        }
-        .update-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .countdown-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .countdown-circle {
-            width: 34px; height: 34px;
-            position: relative;
-        }
-        .countdown-svg { transform: rotate(-90deg); }
-        .cc-bg { fill: none; stroke: var(--surface3); stroke-width: 3; }
-        .cc-prog { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
-        .cc-text {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%,-50%);
-            font-size: 10px; font-weight: 700;
-            color: var(--accent);
-            font-family: 'Space Mono', monospace;
-        }
-
-        .loading-screen {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            min-height: 60vh; gap: 16px;
-        }
-        .spinner-lg {
-            width: 44px; height: 44px;
-            border: 3px solid var(--surface3);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        .loading-text {
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-        .error-box {
-            background: var(--red-dim);
-            border: 1px solid rgba(248,81,73,0.3);
-            border-radius: 12px;
-            padding: 14px 18px;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            color: var(--red);
-            margin-bottom: 14px;
-        }
-
-        @media (max-width: 560px) {
-            .price-usd { font-size: 38px; }
-            .price-chf { font-size: 22px; }
-            .price-row { flex-direction: column; align-items: flex-start; }
-            .price-chf-block { text-align: left; }
-            .currency-strip { grid-template-columns: 1fr 1fr; }
-        }
+        /* ── MISC ── */
+        .loading-screen { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px; }
+        .spinner-lg { width:44px;height:44px;border:3px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
+        .loading-text { font-family:'Space Mono',monospace;font-size:13px;color:var(--text-muted); }
+        .error-box { background:var(--red-dim);border:1px solid rgba(248,81,73,0.3);border-radius:12px;padding:14px 18px;font-family:'Space Mono',monospace;font-size:12px;color:var(--red);margin-bottom:14px; }
     </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
 const UPDATE_INTERVAL = 10000;
-const CHART_REFRESH   = 60000; // refresh historical every 60s
+const CHART_REFRESH   = 120000;
+
+const DCA_LEVELS = [
+    { price: 45000, label: 'CHF 45k', qty: '1 BTC' },
+    { price: 40000, label: 'CHF 40k', qty: '1 BTC' },
+    { price: 35000, label: 'CHF 35k', qty: '1 BTC' },
+    { price: 30000, label: 'CHF 30k', qty: '1 BTC' },
+];
 
 function BTCTracker() {
-    const [priceData,    setPriceData]    = useState(null);
-    const [prevPrice,    setPrevPrice]    = useState(null);
-    const [chfRate,      setChfRate]      = useState(null);
-    const [trend,        setTrend]        = useState('neutral');
-    const [loading,      setLoading]      = useState(true);
-    const [error,        setError]        = useState(null);
-    const [lastUpdate,   setLastUpdate]   = useState(null);
-    const [sparkHistory, setSparkHistory] = useState([]);
-    const [countdown,    setCountdown]    = useState(10);
-    const [isPulsing,    setIsPulsing]    = useState(false);
-    const [btcAmount,    setBtcAmount]    = useState('');
-    const [timeframe,    setTimeframe]    = useState('7');   // '7', '30', '365', '1825'
-    const [chartData,    setChartData]    = useState(null);
-    const [chartLoading, setChartLoading] = useState(false);
-    const chartRef   = useRef(null);
-    const chartInst  = useRef(null);
-    const canvasRef  = useRef(null);
+    const [priceData,     setPriceData]     = useState(null);
+    const [prevPrice,     setPrevPrice]     = useState(null);
+    const [chfRate,       setChfRate]       = useState(null);
+    const [annualData,    setAnnualData]    = useState(null);
+    const [trend,         setTrend]         = useState('neutral');
+    const [loading,       setLoading]       = useState(true);
+    const [error,         setError]         = useState(null);
+    const [lastUpdate,    setLastUpdate]    = useState(null);
+    const [sparkHistory,  setSparkHistory]  = useState([]);
+    const [countdown,     setCountdown]     = useState(10);
+    const [isPulsing,     setIsPulsing]     = useState(false);
+    const [fearGreed,     setFearGreed]     = useState(null);
+    const [mayerMult,     setMayerMult]     = useState(null);
+    const [btcAmount,     setBtcAmount]     = useState(() => { try { return localStorage.getItem('btcAmount') || ''; } catch(_){ return ''; } });
+    const [timeframe,     setTimeframe]     = useState('7');
+    const [chartCurrency, setChartCurrency] = useState('chf');
+    const [chartData,     setChartData]     = useState(null);
+    const [chartLoading,  setChartLoading]  = useState(false);
+    const chartInst = useRef(null);
+    const canvasRef = useRef(null);
 
-    // ── Fetch live price + CHF rate ─────────────────────────────
+    // Persist BTC amount
+    useEffect(() => { try { localStorage.setItem('btcAmount', btcAmount); } catch(_){} }, [btcAmount]);
+
+    // ── Live price ───────────────────────────────────────────────
     const fetchPrice = useCallback(async () => {
         try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 8000);
-
-            const res = await fetch(
+            const ctrl = new AbortController();
+            const to   = setTimeout(() => ctrl.abort(), 8000);
+            const res  = await fetch(
                 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,chf&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true&include_24hr_high=true&include_24hr_low=true',
-                { signal: controller.signal }
+                { signal: ctrl.signal }
             );
-            clearTimeout(timeout);
-
+            clearTimeout(to);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             const btc  = data.bitcoin;
-
-            // Derive CHF/USD rate from BTC prices in both currencies
-            let rate = null;
-            if (btc.chf && btc.usd) rate = btc.chf / btc.usd;
+            const rate = (btc.chf && btc.usd) ? btc.chf / btc.usd : null;
             setChfRate(rate);
-
-            // trend
             if (prevPrice !== null) {
-                if      (btc.usd > prevPrice) setTrend('up');
-                else if (btc.usd < prevPrice) setTrend('down');
-                else                           setTrend('neutral');
+                setTrend(btc.usd > prevPrice ? 'up' : btc.usd < prevPrice ? 'down' : 'neutral');
                 setIsPulsing(true);
                 setTimeout(() => setIsPulsing(false), 400);
             }
@@ -659,17 +240,48 @@ function BTCTracker() {
             setError(null);
             setCountdown(10);
         } catch (e) {
-            const msg = e.name === 'AbortError'
-                ? 'Timeout: la API tardó demasiado. Reintentando...'
-                : 'No se pudo conectar con CoinGecko. Reintentando...';
-            setError(msg);
-            setLoading(false); // salir del estado de carga para mostrar el error
+            setError(e.name === 'AbortError' ? 'Timeout. Reintentando...' : 'Error de conexión. Reintentando...');
+            setLoading(false);
         }
     }, [prevPrice]);
 
-    // ── Fetch historical chart data ──────────────────────────────
+    // ── Annual high/low (uses 365d chart) ───────────────────────
+    const fetchAnnualData = useCallback(async () => {
+        try {
+            const res = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily');
+            if (!res.ok) return;
+            const data   = await res.json();
+            const prices = data.prices.map(([,p]) => p);
+            setAnnualData({ high: Math.max(...prices), low: Math.min(...prices) });
+        } catch(_) {}
+    }, []);
+
+    // ── Fear & Greed ─────────────────────────────────────────────
+    const fetchFearGreed = useCallback(async () => {
+        try {
+            const res  = await fetch('https://api.alternative.me/fng/?limit=1');
+            if (!res.ok) return;
+            const data = await res.json();
+            setFearGreed(data.data[0]);
+        } catch(_) {}
+    }, []);
+
+    // ── Mayer Multiple (current price / 200d MA) ─────────────────
+    const fetchMayer = useCallback(async () => {
+        try {
+            const res  = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=200&interval=daily');
+            if (!res.ok) return;
+            const data   = await res.json();
+            const prices = data.prices.map(([,p]) => p);
+            const ma200  = prices.reduce((a,b) => a+b, 0) / prices.length;
+            setMayerMult(prices[prices.length - 1] / ma200);
+        } catch(_) {}
+    }, []);
+
+    // ── Historical chart ─────────────────────────────────────────
     const fetchHistory = useCallback(async (days) => {
         setChartLoading(true);
+        setChartData(null);
         try {
             const interval = days === '7' ? 'hourly' : 'daily';
             const res = await fetch(
@@ -678,14 +290,14 @@ function BTCTracker() {
             if (!res.ok) throw new Error();
             const data = await res.json();
             setChartData(data.prices);
-        } catch (_) {
+        } catch(_) {
             setChartData(null);
         } finally {
             setChartLoading(false);
         }
     }, []);
 
-    // ── Init ─────────────────────────────────────────────────────
+    // ── Intervals ────────────────────────────────────────────────
     useEffect(() => {
         fetchPrice();
         const iv = setInterval(fetchPrice, UPDATE_INTERVAL);
@@ -693,49 +305,61 @@ function BTCTracker() {
     }, [prevPrice]);
 
     useEffect(() => {
+        fetchAnnualData();
+        fetchFearGreed();
+        fetchMayer();
+        const i1 = setInterval(fetchAnnualData, 3600000);
+        const i2 = setInterval(fetchFearGreed,  3600000);
+        const i3 = setInterval(fetchMayer,       900000);
+        return () => { clearInterval(i1); clearInterval(i2); clearInterval(i3); };
+    }, []);
+
+    useEffect(() => {
         fetchHistory(timeframe);
         const iv = setInterval(() => fetchHistory(timeframe), CHART_REFRESH);
         return () => clearInterval(iv);
     }, [timeframe]);
 
-    // ── Countdown ────────────────────────────────────────────────
     useEffect(() => {
         if (loading || !priceData) return;
         const t = setInterval(() => setCountdown(c => c <= 1 ? 10 : c - 1), 1000);
         return () => clearInterval(t);
     }, [loading, priceData]);
 
-    // ── Build / update Chart.js ──────────────────────────────────
+    // ── Build chart ──────────────────────────────────────────────
     useEffect(() => {
-        if (!chartData || !canvasRef.current) return;
+        if (!chartData || !canvasRef.current || !chfRate) return;
+
+        if (chartInst.current) { chartInst.current.destroy(); chartInst.current = null; }
+
+        const btcQty = parseFloat(btcAmount) || 1;
+        const isChf  = chartCurrency === 'chf';
+        const mult   = isChf ? chfRate * btcQty : btcQty;
 
         const labels = chartData.map(([ts]) => {
             const d = new Date(ts);
-            if (timeframe === '7')    return d.toLocaleDateString('es-ES', { weekday:'short', hour:'2-digit', minute:'2-digit' });
-            if (timeframe === '30')   return d.toLocaleDateString('es-ES', { month:'short', day:'numeric' });
-            if (timeframe === '365')  return d.toLocaleDateString('es-ES', { month:'short', day:'numeric' });
-            return d.toLocaleDateString('es-ES', { year:'numeric', month:'short' }); // 5Y
+            if (timeframe === '7')    return d.toLocaleDateString('es-ES', {weekday:'short',hour:'2-digit',minute:'2-digit'});
+            if (timeframe === '30')   return d.toLocaleDateString('es-ES', {month:'short',day:'numeric'});
+            if (timeframe === '365')  return d.toLocaleDateString('es-ES', {month:'short',day:'numeric'});
+            return d.toLocaleDateString('es-ES', {year:'numeric',month:'short'});
         });
-        const prices = chartData.map(([, p]) => p);
-        const isUp   = prices[prices.length - 1] >= prices[0];
-        const color  = isUp ? '#3fb950' : '#f85149';
-        const colorA = isUp ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)';
-
-        if (chartInst.current) {
-            chartInst.current.destroy();
-        }
+        const values = chartData.map(([,p]) => +(p * mult).toFixed(0));
+        const color  = isChf ? '#29b6f6' : '#f7931a';
+        const colorA = isChf ? 'rgba(41,182,246,0.18)' : 'rgba(247,147,26,0.18)';
 
         const ctx = canvasRef.current.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 240);
         gradient.addColorStop(0, colorA);
         gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+        const prefix = isChf ? 'CHF ' : '$';
 
         chartInst.current = new Chart(ctx, {
             type: 'line',
             data: {
                 labels,
                 datasets: [{
-                    data: prices,
+                    data: values,
                     borderColor: color,
                     borderWidth: 2,
                     backgroundColor: gradient,
@@ -749,6 +373,7 @@ function BTCTracker() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 350 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -757,78 +382,84 @@ function BTCTracker() {
                         borderWidth: 1,
                         titleColor: '#7d8590',
                         bodyColor: '#e6edf3',
-                        titleFont: { family: "'Space Mono', monospace", size: 10 },
-                        bodyFont:  { family: "'Space Mono', monospace", size: 13, weight: '700' },
+                        titleFont: { family:"'Space Mono',monospace", size:10 },
+                        bodyFont:  { family:"'Space Mono',monospace", size:13, weight:'700' },
                         callbacks: {
-                            label: ctx => ' $' + ctx.parsed.y.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                            label: c => {
+                                const v = c.parsed.y;
+                                if(v >= 1000000) return ' ' + prefix + (v/1000000).toFixed(2) + 'M';
+                                if(v >= 1000)    return ' ' + prefix + Math.round(v).toLocaleString('es-ES');
+                                return ' ' + prefix + v;
+                            }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        ticks: {
-                            color: '#484f58',
-                            font: { family: "'Space Mono', monospace", size: 9 },
-                            maxTicksLimit: timeframe === '7' ? 7 : timeframe === '30' ? 10 : 12,
-                            maxRotation: 0,
-                        },
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        border: { color: 'rgba(255,255,255,0.07)' }
+                        ticks: { color:'#484f58', font:{family:"'Space Mono',monospace",size:9}, maxTicksLimit:timeframe==='7'?7:timeframe==='30'?10:12, maxRotation:0 },
+                        grid:  { color:'rgba(255,255,255,0.04)' },
+                        border:{ color:'rgba(255,255,255,0.07)' }
                     },
                     y: {
                         position: 'right',
                         ticks: {
-                            color: '#484f58',
-                            font: { family: "'Space Mono', monospace", size: 9 },
-                            callback: v => '$' + (v/1000).toFixed(0) + 'k'
+                            color:'#484f58',
+                            font:{family:"'Space Mono',monospace",size:9},
+                            callback: v => {
+                                if(v >= 1000000) return prefix+(v/1000000).toFixed(1)+'M';
+                                if(v >= 1000)    return prefix+(v/1000).toFixed(0)+'k';
+                                return prefix+v;
+                            }
                         },
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        border: { color: 'rgba(255,255,255,0.07)' }
+                        grid:  { color:'rgba(255,255,255,0.04)' },
+                        border:{ color:'rgba(255,255,255,0.07)' }
                     }
                 },
-                interaction: { mode: 'index', intersect: false }
+                interaction: { mode:'index', intersect:false }
             }
         });
-    }, [chartData, timeframe]);
+    }, [chartData, timeframe, chartCurrency, chfRate, btcAmount]);
 
     // ── Helpers ──────────────────────────────────────────────────
     const fmtUSD = v => '$' + Math.round(v).toLocaleString('es-ES');
     const fmtCHF = v => 'CHF ' + Math.round(v).toLocaleString('es-ES');
     const fmtB   = v => {
-        if (v >= 1e9)  return '$' + (v/1e9).toFixed(2) + 'B';
-        if (v >= 1e6)  return '$' + (v/1e6).toFixed(2) + 'M';
-        return '$' + v.toLocaleString('es-ES');
+        if(v >= 1e9) return '$'+(v/1e9).toFixed(2)+'B';
+        if(v >= 1e6) return '$'+(v/1e6).toFixed(2)+'M';
+        return '$'+v.toLocaleString('es-ES');
+    };
+
+    const fgConfig = v => {
+        if(v <= 24) return { cls:'fg-extreme-fear',  label:'Miedo Extremo',   sem:'sem-red',    color:'#f85149' };
+        if(v <= 44) return { cls:'fg-fear',           label:'Miedo',           sem:'sem-red',    color:'#f97316' };
+        if(v <= 55) return { cls:'fg-neutral',        label:'Neutral',         sem:'sem-yellow', color:'#e3b341' };
+        if(v <= 74) return { cls:'fg-greed',          label:'Codicia',         sem:'sem-green',  color:'#3fb950' };
+        return               { cls:'fg-extreme-greed', label:'Codicia Extrema', sem:'sem-green',  color:'#22c55e' };
+    };
+    const mayerConfig = m => {
+        if(m < 0.8)  return { cls:'mayer-low',    label:'Infravalorado', sem:'sem-green',  hint:'Zona de acumulación' };
+        if(m < 1.5)  return { cls:'mayer-normal', label:'Normal',        sem:'sem-yellow', hint:'Zona neutral' };
+        return               { cls:'mayer-high',   label:'Sobrecomprado', sem:'sem-red',    hint:'Precaución' };
     };
 
     const Sparkline = ({ data }) => {
-        if (data.length < 2) return null;
-        const W = 200, H = 32, P = 2;
-        const max = Math.max(...data), min = Math.min(...data), rng = max - min || 1;
-        const pts = data.map((v, i) => {
-            const x = (i / (data.length - 1)) * (W - P*2) + P;
-            const y = H - ((v - min) / rng) * (H - P*2) - P;
-            return `${x},${y}`;
-        }).join(' ');
-        const isUp = data[data.length-1] >= data[0];
+        if(data.length < 2) return null;
+        const W=200,H=32,P=2,max=Math.max(...data),min=Math.min(...data),rng=max-min||1;
+        const pts = data.map((v,i) => `${(i/(data.length-1))*(W-P*2)+P},${H-((v-min)/rng)*(H-P*2)-P}`).join(' ');
         return (
-            <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: H }}>
-                <polyline points={pts} fill="none"
-                    stroke={isUp ? 'var(--green)' : 'var(--red)'}
-                    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:H}}>
+                <polyline points={pts} fill="none" stroke={data[data.length-1]>=data[0]?'var(--green)':'var(--red)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
         );
     };
 
-    const CountdownCircle = ({ s, total = 10 }) => {
-        const sz = 34, sw = 3, r = (sz - sw) / 2;
-        const circ = 2 * Math.PI * r;
-        const offset = circ - (s / total) * circ;
+    const CountdownCircle = ({ s, total=10 }) => {
+        const sz=34, r=(sz-3)/2, circ=2*Math.PI*r, offset=circ-(s/total)*circ;
         return (
             <div className="countdown-circle">
                 <svg className="countdown-svg" width={sz} height={sz}>
-                    <circle className="cc-bg"   cx={sz/2} cy={sz/2} r={r} />
-                    <circle className="cc-prog" cx={sz/2} cy={sz/2} r={r}
-                        strokeDasharray={circ} strokeDashoffset={offset} />
+                    <circle className="cc-bg"   cx={sz/2} cy={sz/2} r={r}/>
+                    <circle className="cc-prog" cx={sz/2} cy={sz/2} r={r} strokeDasharray={circ} strokeDashoffset={offset}/>
                 </svg>
                 <div className="cc-text">{s}s</div>
             </div>
@@ -844,7 +475,7 @@ function BTCTracker() {
                         <>
                             <div style={{fontSize:32}}>⚠</div>
                             <div className="error-box" style={{textAlign:'center'}}>{error}</div>
-                            <div className="loading-text" style={{color:'var(--text-dim)'}}>Reintentando automáticamente cada 10s...</div>
+                            <div className="loading-text" style={{color:'var(--text-dim)'}}>Reintentando cada 10s...</div>
                         </>
                     ) : (
                         <>
@@ -857,9 +488,15 @@ function BTCTracker() {
         );
     }
 
-    const chfPrice = priceData?.chf ?? (priceData?.usd && chfRate ? priceData.usd * chfRate : null);
-    const changeClass = (c) => c > 0 ? 'pos' : c < 0 ? 'neg' : 'neu';
-    const changeSign  = (c) => c > 0 ? '+' : '';
+    const chfPrice   = priceData?.chf ?? (priceData?.usd && chfRate ? priceData.usd * chfRate : null);
+    const changeClass = c => c > 0 ? 'pos' : c < 0 ? 'neg' : 'neu';
+    const changeSign  = c => c > 0 ? '+' : '';
+    const btcQty      = parseFloat(btcAmount) || 0;
+    const high24      = priceData?.usd_24h_high;
+    const low24       = priceData?.usd_24h_low;
+    const currentChf  = priceData?.usd && chfRate ? priceData.usd * chfRate : null;
+
+    const tfLabels = { '7':'7 días · hora','30':'30 días','365':'1 año','1825':'5 años' };
 
     return (
         <div className="container">
@@ -873,196 +510,255 @@ function BTCTracker() {
                         <div className="header-sub">BTC · USD · CHF</div>
                     </div>
                 </div>
-                <div className="live-badge">
-                    <div className="live-dot"></div>
-                    LIVE
-                </div>
+                <div className="live-badge"><div className="live-dot"></div>LIVE</div>
             </div>
 
             {error && <div className="error-box">⚠ {error}</div>}
 
-            {priceData && (
-                <>
-                    {/* MAIN PRICE */}
-                    <div className="price-section">
-                        <div className="price-row">
-                            <div className="price-usd-block">
-                                <div className="price-label">PRECIO ACTUAL · USD</div>
-                                <div className={`price-usd ${isPulsing ? 'pop' : ''} ${trend === 'up' ? 'up' : trend === 'down' ? 'down' : ''}`}>
-                                    {fmtUSD(priceData.usd)}
-                                </div>
-                            </div>
-                            {chfPrice && (
-                                <div className="price-chf-block">
-                                    <div className="price-label" style={{textAlign:'right'}}>EN CHF</div>
-                                    <div className="price-chf">{fmtCHF(chfPrice)}</div>
-                                    {chfRate && (
-                                        <div className="chf-rate-note">
-                                            1 USD ≈ {chfRate.toFixed(4)} CHF
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+            {priceData && (<>
 
-                        <div className="change-row">
-                            <div className={`change-pill ${changeClass(priceData.usd_24h_change)}`}>
-                                <span className="trend-arrow">
-                                    {priceData.usd_24h_change > 0 ? '▲' : priceData.usd_24h_change < 0 ? '▼' : '●'}
-                                </span>
-                                {changeSign(priceData.usd_24h_change)}{priceData.usd_24h_change.toFixed(2)}%
-                                <span style={{opacity:0.6, fontWeight:400}}>24h</span>
+                {/* MAIN PRICE */}
+                <div className="price-section">
+                    <div className="price-row">
+                        <div>
+                            <div className="price-label">PRECIO ACTUAL · USD</div>
+                            <div className={`price-usd ${isPulsing?'pop':''} ${trend==='up'?'up':trend==='down'?'down':''}`}>
+                                {fmtUSD(priceData.usd)}
                             </div>
                         </div>
-
-                        {/* Sparkline (session) */}
-                        {sparkHistory.length > 2 && (
-                            <div className="sparkline-row" style={{marginTop:20}}>
-                                <span className="sparkline-label">SESIÓN</span>
-                                <div style={{flex:1}}>
-                                    <Sparkline data={sparkHistory} />
-                                </div>
+                        {chfPrice && (
+                            <div className="price-chf-block">
+                                <div className="price-label" style={{textAlign:'right'}}>EN CHF</div>
+                                <div className="price-chf">{fmtCHF(chfPrice)}</div>
+                                {chfRate && <div className="chf-rate-note">1 USD ≈ {chfRate.toFixed(4)} CHF</div>}
                             </div>
                         )}
                     </div>
+                    <div className="change-row">
+                        <div className={`change-pill ${changeClass(priceData.usd_24h_change)}`}>
+                            <span>{priceData.usd_24h_change > 0 ? '▲' : priceData.usd_24h_change < 0 ? '▼' : '●'}</span>
+                            {changeSign(priceData.usd_24h_change)}{priceData.usd_24h_change.toFixed(2)}%
+                            <span style={{opacity:0.6,fontWeight:400}}>24h</span>
+                        </div>
+                    </div>
+                    {sparkHistory.length > 2 && (
+                        <div className="sparkline-row" style={{marginTop:20}}>
+                            <span className="sparkline-label">SESIÓN</span>
+                            <div style={{flex:1}}><Sparkline data={sparkHistory}/></div>
+                        </div>
+                    )}
+                </div>
 
-                    {/* CURRENCY CARDS */}
-                    <div className="currency-strip">
-                        <div className="currency-card usd-card">
-                            <div className="currency-icon">USD ·  24H</div>
-                            <div className="currency-value">{fmtUSD(priceData.usd_24h_high || priceData.usd)}</div>
+                {/* 24H HIGH/LOW */}
+                <div className="currency-strip">
+                    <div className="currency-card usd-card">
+                        <div className="currency-icon">USD · 24H</div>
+                        <div className="currency-value" style={{color:'var(--green)'}}>{high24 ? fmtUSD(high24) : '—'}</div>
+                        <div className="currency-sub">Máximo ↑</div>
+                        <div className="currency-value" style={{marginTop:6,color:'var(--red)'}}>{low24 ? fmtUSD(low24) : '—'}</div>
+                        <div className="currency-sub">Mínimo ↓</div>
+                    </div>
+                    <div className="currency-card chf-card">
+                        <div className="currency-icon">CHF · 24H</div>
+                        {chfRate ? (<>
+                            <div className="currency-value" style={{color:'var(--green)'}}>{high24 ? fmtCHF(high24*chfRate) : '—'}</div>
                             <div className="currency-sub">Máximo ↑</div>
-                            <div className="currency-value" style={{marginTop:6, color:'var(--red)'}}>{fmtUSD(priceData.usd_24h_low || priceData.usd)}</div>
+                            <div className="currency-value" style={{marginTop:6,color:'var(--red)'}}>{low24 ? fmtCHF(low24*chfRate) : '—'}</div>
                             <div className="currency-sub">Mínimo ↓</div>
-                        </div>
-                        <div className="currency-card chf-card">
-                            <div className="currency-icon">CHF ·  24H</div>
-                            {chfPrice && chfRate ? (
-                                <>
-                                    <div className="currency-value">{fmtCHF((priceData.usd_24h_high || priceData.usd) * chfRate)}</div>
-                                    <div className="currency-sub">Máximo ↑</div>
-                                    <div className="currency-value" style={{marginTop:6, color:'var(--red)'}}>{fmtCHF((priceData.usd_24h_low || priceData.usd) * chfRate)}</div>
-                                    <div className="currency-sub">Mínimo ↓</div>
-                                </>
-                            ) : (
-                                <div className="currency-sub" style={{paddingTop:8}}>Cargando tipo de cambio...</div>
-                            )}
+                        </>) : <div className="currency-sub" style={{paddingTop:8}}>Cargando...</div>}
+                    </div>
+                </div>
+
+                {/* STATS — MktCap + Vol + Annual High/Low */}
+                <div className="stats-grid">
+                    <div className="stat-card">
+                        <div className="stat-label">MKT CAP</div>
+                        <div className="stat-value">{fmtB(priceData.usd_market_cap)}</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-label">VOL 24H</div>
+                        <div className="stat-value">{fmtB(priceData.usd_24h_vol)}</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-label">HIGH 1Y</div>
+                        <div className="stat-value" style={{color:'var(--green)'}}>
+                            {annualData ? fmtUSD(annualData.high) : '—'}
                         </div>
                     </div>
-
-                    {/* STATS */}
-                    <div className="stats-grid">
-                        <div className="stat-card">
-                            <div className="stat-label">MKT CAP</div>
-                            <div className="stat-value">{fmtB(priceData.usd_market_cap)}</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-label">VOL 24H</div>
-                            <div className="stat-value">{fmtB(priceData.usd_24h_vol)}</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-label">USD HIGH</div>
-                            <div className="stat-value" style={{color:'var(--green)'}}>{fmtUSD(priceData.usd_24h_high || priceData.usd)}</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-label">USD LOW</div>
-                            <div className="stat-value" style={{color:'var(--red)'}}>{fmtUSD(priceData.usd_24h_low || priceData.usd)}</div>
+                    <div className="stat-card">
+                        <div className="stat-label">LOW 1Y</div>
+                        <div className="stat-value" style={{color:'var(--red)'}}>
+                            {annualData ? fmtUSD(annualData.low) : '—'}
                         </div>
                     </div>
+                </div>
 
-                    {/* PORTFOLIO */}
-                    <div className="portfolio-section">
-                        <div className="portfolio-header">
-                            <div className="portfolio-title">Mi Portfolio BTC</div>
-                            <div className="btc-input-wrap">
-                                <span className="btc-input-label">₿</span>
-                                <input
-                                    className="btc-input"
-                                    type="number"
-                                    min="0"
-                                    step="0.0001"
-                                    placeholder="0.0000"
-                                    value={btcAmount}
-                                    onChange={e => setBtcAmount(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        {parseFloat(btcAmount) > 0 && chfRate ? (
-                            <div className="portfolio-values">
-                                <div className="portfolio-val-card chf-val">
-                                    <div className="portfolio-val-label">VALOR EN CHF</div>
-                                    <div className="portfolio-val-amount">
-                                        {fmtCHF(parseFloat(btcAmount) * priceData.usd * chfRate)}
+                {/* FEAR & GREED + MAYER */}
+                <div className="indicators-row">
+                    <div className="indicator-card">
+                        <div className="indicator-label">FEAR & GREED INDEX</div>
+                        {fearGreed ? (() => {
+                            const v = parseInt(fearGreed.value);
+                            const cfg = fgConfig(v);
+                            return (<>
+                                <div className="indicator-main">
+                                    <div className={`indicator-score ${cfg.cls}`}>{v}</div>
+                                    <div>
+                                        <div className="indicator-name">
+                                            <span className={`semaphore ${cfg.sem}`}></span>
+                                            {cfg.label}
+                                        </div>
+                                        <div className="indicator-sub">/ 100</div>
                                     </div>
-                                    <div className="portfolio-val-sub">{btcAmount} BTC × {fmtCHF(Math.round(priceData.usd * chfRate))}</div>
                                 </div>
-                                <div className="portfolio-val-card usd-val">
-                                    <div className="portfolio-val-label">VALOR EN USD</div>
-                                    <div className="portfolio-val-amount">
-                                        {fmtUSD(parseFloat(btcAmount) * priceData.usd)}
+                                <div className="fg-bar-wrap">
+                                    <div className="fg-bar-track">
+                                        <div className="fg-bar-fill" style={{width:`${v}%`,background:cfg.color}}></div>
                                     </div>
-                                    <div className="portfolio-val-sub">{btcAmount} BTC × {fmtUSD(priceData.usd)}</div>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="portfolio-empty">
-                                Introduce tus BTC para ver el valor de tu portfolio →
-                            </div>
-                        )}
+                            </>);
+                        })() : <div className="indicator-sub" style={{paddingTop:8}}>Cargando...</div>}
                     </div>
 
-                    {/* HISTORICAL CHART */}
-                    <div className="chart-section">
-                        <div className="chart-header">
-                            <div className="chart-title">
-                                Histórico
-                                <span>{{
-                                    '7':    '7 días · por hora',
-                                    '30':   '30 días · diario',
-                                    '365':  '1 año · diario',
-                                    '1825': '5 años · diario'
-                                }[timeframe]}</span>
+                    <div className="indicator-card">
+                        <div className="indicator-label">MAYER MULTIPLE</div>
+                        {mayerMult ? (() => {
+                            const cfg = mayerConfig(mayerMult);
+                            return (
+                                <div className="indicator-main">
+                                    <div className={`indicator-score ${cfg.cls}`}>{mayerMult.toFixed(2)}</div>
+                                    <div>
+                                        <div className="indicator-name">
+                                            <span className={`semaphore ${cfg.sem}`}></span>
+                                            {cfg.label}
+                                        </div>
+                                        <div className="indicator-sub">Precio / MA200</div>
+                                        <div className="indicator-sub" style={{marginTop:3}}>{cfg.hint}</div>
+                                    </div>
+                                </div>
+                            );
+                        })() : <div className="indicator-sub" style={{paddingTop:8}}>Cargando...</div>}
+                    </div>
+                </div>
+
+                {/* PORTFOLIO */}
+                <div className="portfolio-section">
+                    <div className="portfolio-header">
+                        <div className="portfolio-title">Mi Portfolio BTC</div>
+                        <div className="btc-input-wrap">
+                            <span className="btc-input-label">₿</span>
+                            <input
+                                className="btc-input"
+                                type="number" min="0" step="0.0001" placeholder="0.0000"
+                                value={btcAmount}
+                                onChange={e => setBtcAmount(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    {btcQty > 0 && chfRate ? (
+                        <div className="portfolio-values">
+                            <div className="portfolio-val-card chf-val">
+                                <div className="portfolio-val-label">VALOR EN CHF</div>
+                                <div className="portfolio-val-amount">{fmtCHF(btcQty * priceData.usd * chfRate)}</div>
+                                <div className="portfolio-val-sub">{btcAmount} BTC × {fmtCHF(Math.round(priceData.usd * chfRate))}</div>
+                            </div>
+                            <div className="portfolio-val-card usd-val">
+                                <div className="portfolio-val-label">VALOR EN USD</div>
+                                <div className="portfolio-val-amount">{fmtUSD(btcQty * priceData.usd)}</div>
+                                <div className="portfolio-val-sub">{btcAmount} BTC × {fmtUSD(priceData.usd)}</div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="portfolio-empty">Introduce tus BTC para ver el valor →</div>
+                    )}
+                </div>
+
+                {/* DCA LEVELS */}
+                {currentChf && (
+                    <div className="dca-section">
+                        <div className="dca-header">
+                            <div className="dca-title">Niveles DCA</div>
+                            <div className="dca-subtitle">Actual: {fmtCHF(currentChf)}</div>
+                        </div>
+                        <div className="dca-levels">
+                            {DCA_LEVELS.map(lvl => {
+                                const reached  = currentChf <= lvl.price;
+                                // % of the way from current price down to target
+                                const maxDrop  = currentChf * 0.6; // reference = 60% drop from current
+                                const dropped  = currentChf - Math.max(currentChf, lvl.price);
+                                const progress = reached ? 100 : Math.max(0, Math.min(99,
+                                    ((currentChf - lvl.price) / (currentChf - lvl.price * 0.5)) * 100
+                                ));
+                                const pctAway  = reached
+                                    ? '✓ ALCANZADO'
+                                    : `-${(((currentChf - lvl.price) / currentChf) * 100).toFixed(1)}%`;
+                                return (
+                                    <div key={lvl.price} className={`dca-level ${reached ? 'reached' : ''}`}>
+                                        <div className="dca-price-tag">{lvl.label}</div>
+                                        <div className="dca-bar-track">
+                                            <div className="dca-bar-fill" style={{width:`${reached ? 100 : Math.max(5, 100 - ((currentChf - lvl.price) / (currentChf * 0.5)) * 100)}%`}}></div>
+                                        </div>
+                                        <div className="dca-pct" style={{color: reached ? 'var(--green)' : 'var(--yellow)'}}>{pctAway}</div>
+                                        <div className="dca-action">{reached ? '✓ Comprar '+lvl.qty : 'Comprar '+lvl.qty}</div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* PORTFOLIO CHART */}
+                <div className="chart-section">
+                    <div className="chart-header">
+                        <div className="chart-title">
+                            Portfolio
+                            <span>{btcQty > 0 ? `${btcAmount} BTC · ` : '1 BTC · '}{tfLabels[timeframe]}</span>
+                        </div>
+                        <div className="chart-header-right">
+                            <div className="timeframe-tabs">
+                                <button className={`tab-btn ${chartCurrency==='chf'?'active chf':''}`} onClick={()=>setChartCurrency('chf')}>CHF</button>
+                                <button className={`tab-btn ${chartCurrency==='usd'?'active':''}`}     onClick={()=>setChartCurrency('usd')}>USD</button>
                             </div>
                             <div className="timeframe-tabs">
-                                {[['7','7D'],['30','30D'],['365','1Y'],['1825','5Y']].map(([val, label]) => (
-                                    <button
-                                        key={val}
-                                        className={`tab-btn ${timeframe === val ? 'active' : ''}`}
-                                        onClick={() => setTimeframe(val)}>
-                                        {label}
-                                    </button>
+                                {[['7','7D'],['30','30D'],['365','1Y'],['1825','5Y']].map(([val,lbl]) => (
+                                    <button key={val} className={`tab-btn ${timeframe===val?'active':''}`} onClick={()=>setTimeframe(val)}>{lbl}</button>
                                 ))}
                             </div>
                         </div>
-                        <div className="chart-wrapper">
-                            {chartLoading && (
-                                <div className="chart-loading">
-                                    <div className="mini-spinner"></div>
-                                    Cargando histórico...
-                                </div>
-                            )}
-                            <canvas ref={canvasRef} style={{ opacity: chartLoading ? 0.3 : 1, transition: 'opacity 0.3s' }} />
-                        </div>
                     </div>
+                    {btcQty === 0 && (
+                        <div className="chart-hint">Mostrando 1 BTC — introduce tu cantidad arriba para ver tu portfolio real</div>
+                    )}
+                    <div className="chart-wrapper">
+                        {chartLoading && (
+                            <div className="chart-loading">
+                                <div className="mini-spinner"></div>
+                                Cargando histórico...
+                            </div>
+                        )}
+                        <canvas ref={canvasRef} style={{opacity:chartLoading?0.15:1,transition:'opacity 0.3s'}}/>
+                    </div>
+                </div>
 
-                    {/* FOOTER */}
-                    <div className="footer-bar">
-                        <div className="update-info">
-                            <div className="live-dot" style={{background:'var(--green)'}}></div>
-                            {lastUpdate ? lastUpdate.toLocaleTimeString('es-ES') : '—'}
-                        </div>
-                        <div className="countdown-wrap">
-                            <span>próx. actualización</span>
-                            <CountdownCircle s={countdown} />
-                        </div>
+                {/* FOOTER */}
+                <div className="footer-bar">
+                    <div className="update-info">
+                        <div className="live-dot" style={{background:'var(--green)'}}></div>
+                        {lastUpdate ? lastUpdate.toLocaleTimeString('es-ES') : '—'}
                     </div>
-                </>
-            )}
+                    <div className="countdown-wrap">
+                        <span>próx. actualización</span>
+                        <CountdownCircle s={countdown}/>
+                    </div>
+                </div>
+
+            </>)}
         </div>
     );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<BTCTracker />);
+ReactDOM.createRoot(document.getElementById('root')).render(<BTCTracker/>);
 </script>
 </body>
 </html>
+
