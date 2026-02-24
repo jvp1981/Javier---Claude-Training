@@ -296,12 +296,12 @@ function BTCTracker() {
         }
     }, [prevPrice]);
 
-    // ── 2. Secondary data — only 2 API calls total ───────────────
+    // ── 2. Secondary data — 3 staggered calls ────────────────────
     useEffect(() => {
         let cancelled = false;
         async function loadSecondary() {
 
-            // Call A: Fear & Greed (different domain, no rate limit conflict)
+            // Call A: Fear & Greed (different domain, no CoinGecko rate limit)
             try {
                 const fg = await apiFetch('https://api.alternative.me/fng/?limit=1');
                 if (!cancelled) setFearGreed(fg.data[0]);
@@ -309,42 +309,52 @@ function BTCTracker() {
 
             await delay(3000); if (cancelled) return;
 
-            // Call B: 365d daily prices — single CoinGecko call that feeds EVERYTHING:
-            //   chart · annual high/low · Mayer Multiple · Weekly RSI · Realized Price proxy
+            // Call B: 365d daily → chart · annual high/low · Mayer · Weekly RSI
             try {
                 setChartLoading(true);
                 const hist = await apiFetch(
                     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily'
                 );
                 if (!cancelled) {
-                    const prices = hist.prices;          // [[ts, price], ...]
+                    const prices = hist.prices;
                     const vals   = prices.map(([,p]) => p);
                     const n      = vals.length;
 
-                    // Chart + annual high/low
                     setAnnualData({ high: Math.max(...vals), low: Math.min(...vals) });
                     setChartData(prices);
                     setChartLoading(false);
 
-                    // Mayer Multiple: price / MA(200) using all available points up to 200
+                    // Mayer Multiple: current price / 200-day MA
                     const ma200slice = vals.slice(-200);
                     const ma200 = ma200slice.reduce((a,b) => a+b, 0) / ma200slice.length;
                     setMayerMult(vals[n-1] / ma200);
 
-                    // Weekly RSI: resample daily → weekly (take every 7th close), then RSI(14)
-                    // 365 days ÷ 7 ≈ 52 weekly candles — enough for RSI(14) with ~38 extra periods
+                    // Weekly RSI: resample 365 daily points → ~52 weekly closes → RSI(14)
                     const weekly = [];
                     for (let i = 0; i < n; i += 7) weekly.push(vals[i]);
-                    weekly.push(vals[n-1]); // append latest as current week close
+                    weekly.push(vals[n-1]);
                     const rsi = calcRSI(weekly, 14);
                     if (rsi !== null) setWeeklyRSI(rsi);
-
-                    // Realized Price proxy: 365-day SMA (tracks on-chain realized price closely
-                    // in mid-cycle; well-known public approximation when UTXO data unavailable)
-                    const sma365 = vals.reduce((a,b) => a+b, 0) / n;
-                    setRealizedPrice(sma365);
                 }
             } catch(_) { if (!cancelled) setChartLoading(false); }
+
+            await delay(4000); if (cancelled) return;
+
+            // Call C: 1400d daily → 200-week SMA = best free proxy for Realized Price
+            // The 200-week MA (~$54k today) tracks on-chain realized price very closely
+            // and is used by analysts (e.g. PlanB, Glassnode breakdowns) as a public proxy.
+            try {
+                const longHist = await apiFetch(
+                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily'
+                );
+                if (!cancelled) {
+                    const vals = longHist.prices.map(([,p]) => p);
+                    // 200-week MA = last 1400 daily closes (200 × 7 = 1400)
+                    const slice = vals.slice(-1400);
+                    const ma200w = slice.reduce((a,b) => a+b, 0) / slice.length;
+                    setRealizedPrice(ma200w);
+                }
+            } catch(_) {}
         }
         loadSecondary();
         return () => { cancelled = true; };
@@ -694,7 +704,7 @@ function BTCTracker() {
                                             <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
                                         </div>
                                         <div className="indicator-sub">{fmtUSD(realizedPrice)}</div>
-                                        <div className="indicator-sub" style={{marginTop:2}}>{cfg.hint}</div>
+                                        <div className="indicator-sub" style={{marginTop:2}}>~MA 200 semanas</div>
                                     </div>
                                 </div>
                             );
@@ -839,6 +849,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<BTCTracker/>);
 </script>
 </body>
 </html>
+
 
 
 
