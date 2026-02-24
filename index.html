@@ -296,12 +296,12 @@ function BTCTracker() {
         }
     }, [prevPrice]);
 
-    // ── 2. Secondary data — staggered ────────────────────────────
+    // ── 2. Secondary data — only 2 API calls total ───────────────
     useEffect(() => {
         let cancelled = false;
         async function loadSecondary() {
 
-            // Fear & Greed (separate API — no CoinGecko rate limit)
+            // Call A: Fear & Greed (different domain, no rate limit conflict)
             try {
                 const fg = await apiFetch('https://api.alternative.me/fng/?limit=1');
                 if (!cancelled) setFearGreed(fg.data[0]);
@@ -309,94 +309,42 @@ function BTCTracker() {
 
             await delay(3000); if (cancelled) return;
 
-            // 365d daily — chart + annual high/low + Mayer MA200 (same data!)
+            // Call B: 365d daily prices — single CoinGecko call that feeds EVERYTHING:
+            //   chart · annual high/low · Mayer Multiple · Weekly RSI · Realized Price proxy
             try {
                 setChartLoading(true);
                 const hist = await apiFetch(
                     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily'
                 );
                 if (!cancelled) {
-                    const prices = hist.prices;
+                    const prices = hist.prices;          // [[ts, price], ...]
                     const vals   = prices.map(([,p]) => p);
+                    const n      = vals.length;
+
+                    // Chart + annual high/low
                     setAnnualData({ high: Math.max(...vals), low: Math.min(...vals) });
                     setChartData(prices);
                     setChartLoading(false);
-                    // Mayer from last 200 points of this same dataset
-                    const last200 = vals.slice(-200);
-                    if (last200.length >= 50) {
-                        const ma200 = last200.reduce((a,b) => a+b,0) / last200.length;
-                        setMayerMult(vals[vals.length-1] / ma200);
-                    }
+
+                    // Mayer Multiple: price / MA(200) using all available points up to 200
+                    const ma200slice = vals.slice(-200);
+                    const ma200 = ma200slice.reduce((a,b) => a+b, 0) / ma200slice.length;
+                    setMayerMult(vals[n-1] / ma200);
+
+                    // Weekly RSI: resample daily → weekly (take every 7th close), then RSI(14)
+                    // 365 days ÷ 7 ≈ 52 weekly candles — enough for RSI(14) with ~38 extra periods
+                    const weekly = [];
+                    for (let i = 0; i < n; i += 7) weekly.push(vals[i]);
+                    weekly.push(vals[n-1]); // append latest as current week close
+                    const rsi = calcRSI(weekly, 14);
+                    if (rsi !== null) setWeeklyRSI(rsi);
+
+                    // Realized Price proxy: 365-day SMA (tracks on-chain realized price closely
+                    // in mid-cycle; well-known public approximation when UTXO data unavailable)
+                    const sma365 = vals.reduce((a,b) => a+b, 0) / n;
+                    setRealizedPrice(sma365);
                 }
             } catch(_) { if (!cancelled) setChartLoading(false); }
-
-            await delay(3500); if (cancelled) return;
-
-            // Weekly RSI — fetch ~2 years of weekly data (730 days)
-            // CoinGecko doesn't have a "weekly interval" on free plan,
-            // so we fetch 730d daily and manually resample to weekly closes.
-            try {
-                const hist2 = await apiFetch(
-                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=730&interval=daily'
-                );
-                if (!cancelled) {
-                    const allPrices = hist2.prices; // [[ts,price],...]
-                    // Resample: pick one price per 7-day bucket (last day of each week)
-                    const weekly = [];
-                    for (let i = 6; i < allPrices.length; i += 7) {
-                        weekly.push(allPrices[i][1]);
-                    }
-                    // Also add the very last available price as "current week"
-                    weekly.push(allPrices[allPrices.length - 1][1]);
-                    const rsi = calcRSI(weekly, 14);
-                    if (!cancelled && rsi !== null) setWeeklyRSI(rsi);
-                }
-            } catch(_) {}
-
-            await delay(3500); if (cancelled) return;
-
-            // Realized Price via Blockchain.info (UTXO-based, public API)
-            // Fallback: use a known approximation from CoinGecko market data
-            try {
-                // Try CoinGecko's realized cap / circulating supply approximation
-                const mktData = await apiFetch(
-                    'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false'
-                );
-                if (!cancelled && mktData.market_data) {
-                    // Realized price ≈ not directly available in CoinGecko free tier.
-                    // Best public free approximation: glassnode-style estimate via
-                    // 200-week MA as a proxy (historically tracks realized price closely).
-                    // We already have 365d data; fetch 4y for 200-week MA.
-                    // Instead, use the known Lookintobitcoin API (public, no key needed).
-                }
-            } catch(_) {}
-
-            // Realized Price: use Lookintobitcoin public endpoint
-            try {
-                const rpData = await apiFetch(
-                    'https://lookintobitcoin.com/charts/realized-price/data/'
-                );
-                if (!cancelled && rpData && Array.isArray(rpData)) {
-                    const last = rpData[rpData.length - 1];
-                    if (last && last.value) setRealizedPrice(parseFloat(last.value));
-                }
-            } catch(_) {
-                // If Lookintobitcoin fails (CORS likely), compute 200-week MA from longer history
-                try {
-                    await delay(2000);
-                    const longHist = await apiFetch(
-                        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1500&interval=daily'
-                    );
-                    if (!cancelled) {
-                        const vals = longHist.prices.map(([,p]) => p);
-                        // 200-week MA = 1400-day MA (200 * 7)
-                        const window = Math.min(1400, vals.length);
-                        const slice  = vals.slice(-window);
-                        const ma = slice.reduce((a,b) => a+b,0) / slice.length;
-                        setRealizedPrice(ma); // good proxy for realized price
-                    }
-                } catch(_) {}
-            }
         }
         loadSecondary();
         return () => { cancelled = true; };
@@ -891,5 +839,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(<BTCTracker/>);
 </script>
 </body>
 </html>
+
 
 
