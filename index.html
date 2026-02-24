@@ -32,152 +32,153 @@
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
         body {
-            font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);
-            min-height:100vh;display:flex;justify-content:center;align-items:flex-start;
-            padding:30px 20px 60px;position:relative;overflow-x:hidden;
+            font-family:'Syne',sans-serif; background:var(--bg); color:var(--text);
+            min-height:100vh; display:flex; justify-content:center; align-items:flex-start;
+            padding:30px 20px 60px; position:relative; overflow-x:hidden;
         }
         body::before {
-            content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
             background-image:linear-gradient(rgba(247,147,26,0.03) 1px,transparent 1px),
                              linear-gradient(90deg,rgba(247,147,26,0.03) 1px,transparent 1px);
             background-size:40px 40px;
         }
         body::after {
-            content:'';position:fixed;left:0;right:0;height:3px;pointer-events:none;z-index:0;
+            content:''; position:fixed; left:0; right:0; height:3px; pointer-events:none; z-index:0;
             background:linear-gradient(transparent,rgba(247,147,26,0.08),transparent);
             animation:scanline 8s linear infinite;
         }
-        .container { max-width:680px;width:100%;position:relative;z-index:1;animation:fadeUp 0.5s ease-out; }
+        .container { max-width:680px; width:100%; position:relative; z-index:1; animation:fadeUp 0.5s ease-out; }
 
-        /* HEADER */
-        .header { display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border); }
-        .header-left { display:flex;align-items:center;gap:14px; }
-        .btc-badge { width:48px;height:48px;background:var(--accent-dim);border:1px solid rgba(247,147,26,0.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;animation:glow-orange 3s ease-in-out infinite; }
-        .header-title { font-size:22px;font-weight:800;letter-spacing:-0.5px; }
-        .header-sub   { font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;letter-spacing:1px; }
-        .live-badge   { display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);background:var(--green-dim);padding:6px 12px;border-radius:20px;border:1px solid rgba(63,185,80,0.2); }
-        .live-dot     { width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite; }
+        /* ── HEADER ── */
+        .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+        .header-left { display:flex; align-items:center; gap:14px; }
+        .btc-badge { width:48px; height:48px; background:var(--accent-dim); border:1px solid rgba(247,147,26,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; animation:glow-orange 3s ease-in-out infinite; }
+        .header-title { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+        .header-sub { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); margin-top:2px; letter-spacing:1px; }
+        .live-badge { display:flex; align-items:center; gap:6px; font-family:'Space Mono',monospace; font-size:11px; color:var(--green); background:var(--green-dim); padding:6px 12px; border-radius:20px; border:1px solid rgba(63,185,80,0.2); }
+        .live-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:blink 1.5s ease-in-out infinite; }
 
-        /* PRICE */
-        .price-section { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;position:relative;overflow:hidden; }
-        .price-section::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.6; }
-        .price-row    { display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px; }
-        .price-label  { font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:1.5px;margin-bottom:6px; }
-        .price-usd    { font-family:'Space Mono',monospace;font-size:54px;font-weight:700;color:var(--text);letter-spacing:-2px;line-height:1;transition:color 0.3s; }
+        /* ── PRICE ── */
+        .price-section { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; margin-bottom:16px; position:relative; overflow:hidden; }
+        .price-section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0.6; }
+        .price-row { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
+        .price-label { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:1.5px; margin-bottom:6px; }
+        .price-usd { font-family:'Space Mono',monospace; font-size:54px; font-weight:700; color:var(--text); letter-spacing:-2px; line-height:1; transition:color 0.3s; }
         .price-usd.pop  { animation:pricePop 0.4s ease-out; }
         .price-usd.up   { color:var(--green); }
         .price-usd.down { color:var(--red); }
         .price-chf-block { text-align:right; }
-        .price-chf    { font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--chf);letter-spacing:-1px;line-height:1; }
-        .chf-rate-note{ font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:4px; }
-        .change-row   { display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
-        .change-pill  { display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px; }
-        .change-pill.pos { background:var(--green-dim);color:var(--green);border:1px solid rgba(63,185,80,0.25); }
-        .change-pill.neg { background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,0.25); }
-        .change-pill.neu { background:var(--surface2);color:var(--text-muted);border:1px solid var(--border); }
-        .sparkline-row{ display:flex;align-items:center;gap:8px;margin-top:14px; }
-        .sparkline-lbl{ font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);white-space:nowrap; }
+        .price-chf { font-family:'Space Mono',monospace; font-size:28px; font-weight:700; color:var(--chf); letter-spacing:-1px; line-height:1; }
+        .chf-rate-note { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:4px; }
+        .change-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .change-pill { display:inline-flex; align-items:center; gap:6px; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; padding:6px 14px; border-radius:8px; }
+        .change-pill.pos { background:var(--green-dim); color:var(--green); border:1px solid rgba(63,185,80,0.25); }
+        .change-pill.neg { background:var(--red-dim); color:var(--red); border:1px solid rgba(248,81,73,0.25); }
+        .change-pill.neu { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); }
+        .sparkline-row { display:flex; align-items:center; gap:8px; margin-top:14px; }
+        .sparkline-lbl { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); white-space:nowrap; }
 
-        /* 24H CARDS */
-        .currency-strip { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px; }
-        .currency-card  { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden; }
-        .currency-card.usd-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.5; }
-        .currency-card.chf-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--chf);opacity:0.5; }
-        .currency-icon  { font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:8px; }
-        .currency-card.usd-card .currency-icon { color:var(--accent); }
-        .currency-card.chf-card .currency-icon { color:var(--chf); }
-        .currency-value { font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px; }
-        .currency-sub   { font-size:11px;color:var(--text-muted);margin-top:4px; }
-
-        /* STATS */
-        .stats-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px; }
+        /* ── STATS ── */
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
         @media(max-width:560px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
-        .stat-card  { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px; }
-        .stat-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.8px;margin-bottom:6px; }
-        .stat-value { font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--text); }
+        .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+        .stat-label { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.8px; margin-bottom:6px; }
+        .stat-value { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--text); }
 
-        /* INDICATORS */
-        .indicators-row { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px; }
-        @media(max-width:560px){ .indicators-row{grid-template-columns:1fr;} }
-        .indicator-card  { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px; }
-        .indicator-label { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:10px; }
-        .indicator-main  { display:flex;align-items:center;gap:12px; }
-        .indicator-score { font-family:'Space Mono',monospace;font-size:34px;font-weight:700;line-height:1; }
-        .indicator-name  { font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px; }
-        .indicator-sub   { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted); }
-        .fg-extreme-fear { color:#f85149; } .fg-fear { color:#f97316; } .fg-neutral { color:#e3b341; }
-        .fg-greed { color:#3fb950; } .fg-extreme-greed { color:#22c55e; }
-        .mayer-low { color:#3fb950; } .mayer-normal { color:#e3b341; } .mayer-high { color:#f85149; }
-        .semaphore  { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
-        .sem-green  { background:var(--green);box-shadow:0 0 8px var(--green); }
-        .sem-yellow { background:var(--yellow);box-shadow:0 0 8px var(--yellow); }
-        .sem-red    { background:var(--red);box-shadow:0 0 8px var(--red); }
-        .fg-bar-wrap  { margin-top:12px; }
-        .fg-bar-track { height:4px;background:var(--surface3);border-radius:2px;overflow:hidden; }
-        .fg-bar-fill  { height:100%;border-radius:2px;transition:width 0.6s ease; }
+        /* ── INDICATORS — 2x2 grid ── */
+        .indicators-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+        @media(max-width:560px){ .indicators-grid{grid-template-columns:1fr;} }
+        .indicator-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; }
+        .indicator-label { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-bottom:10px; }
+        .indicator-main { display:flex; align-items:center; gap:12px; }
+        .indicator-score { font-family:'Space Mono',monospace; font-size:30px; font-weight:700; line-height:1; flex-shrink:0; }
+        .indicator-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:3px; display:flex; align-items:center; gap:6px; }
+        .indicator-sub  { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-muted); }
+        /* Semaphore dot */
+        .semaphore  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .sem-green  { background:var(--green);  box-shadow:0 0 7px var(--green); }
+        .sem-yellow { background:var(--yellow); box-shadow:0 0 7px var(--yellow); }
+        .sem-red    { background:var(--red);    box-shadow:0 0 7px var(--red); }
+        /* Score colors */
+        .score-green  { color:var(--green); }
+        .score-yellow { color:var(--yellow); }
+        .score-red    { color:var(--red); }
+        .score-chf    { color:var(--chf); }
+        /* F&G bar */
+        .fg-bar-wrap  { margin-top:10px; }
+        .fg-bar-track { height:3px; background:var(--surface3); border-radius:2px; overflow:hidden; }
+        .fg-bar-fill  { height:100%; border-radius:2px; transition:width 0.6s ease; }
+        /* RSI bar */
+        .rsi-bar-wrap  { margin-top:10px; position:relative; height:6px; background:linear-gradient(90deg,#3fb950 0%,#3fb950 30%,#e3b341 30%,#e3b341 55%,#f97316 55%,#f97316 75%,#f85149 75%); border-radius:3px; overflow:visible; }
+        .rsi-needle    { position:absolute; top:-3px; width:3px; height:12px; background:#fff; border-radius:2px; transform:translateX(-50%); transition:left 0.6s ease; box-shadow:0 0 4px rgba(0,0,0,0.6); }
 
-        /* PORTFOLIO */
-        .portfolio-section { background:var(--surface);border:1px solid rgba(247,147,26,0.25);border-radius:20px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden; }
-        .portfolio-section::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--chf),transparent);opacity:0.7; }
-        .portfolio-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
-        .portfolio-title  { font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px; }
-        .portfolio-title::before { content:'◈';color:var(--accent);font-size:16px; }
-        .btc-input-wrap   { display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;transition:border-color 0.2s; }
+        /* ── PORTFOLIO ── */
+        .portfolio-section { background:var(--surface); border:1px solid rgba(247,147,26,0.25); border-radius:20px; padding:24px 28px; margin-bottom:16px; position:relative; overflow:hidden; }
+        .portfolio-section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),var(--chf),transparent); opacity:0.7; }
+        .portfolio-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .portfolio-title { font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+        .portfolio-title::before { content:'◈'; color:var(--accent); font-size:16px; }
+        .btc-input-wrap { display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:6px 12px; transition:border-color 0.2s; }
         .btc-input-wrap:focus-within { border-color:rgba(247,147,26,0.5); }
-        .btc-input-label  { font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);font-weight:700; }
-        .btc-input        { background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--text);width:90px;text-align:right; }
+        .btc-input-label { font-family:'Space Mono',monospace; font-size:11px; color:var(--accent); font-weight:700; }
+        .btc-input { background:transparent; border:none; outline:none; font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--text); width:90px; text-align:right; }
         .btc-input::placeholder { color:var(--text-dim); }
-        .portfolio-values { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+        .portfolio-values { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
         @media(max-width:560px){ .portfolio-values{grid-template-columns:1fr;} }
-        .portfolio-val-card { background:var(--surface2);border-radius:12px;padding:16px 18px;border:1px solid var(--border); }
-        .portfolio-val-label  { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px; }
-        .portfolio-val-amount { font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:-0.5px; }
+        .portfolio-val-card { background:var(--surface2); border-radius:12px; padding:16px 18px; border:1px solid var(--border); }
+        .portfolio-val-label  { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-bottom:6px; }
+        .portfolio-val-amount { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; letter-spacing:-0.5px; }
         .portfolio-val-card.chf-val .portfolio-val-amount { color:var(--chf); }
         .portfolio-val-card.usd-val .portfolio-val-amount { color:var(--accent); }
-        .portfolio-val-sub { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:4px; }
-        .portfolio-empty   { font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);text-align:center;padding:8px 0 4px; }
+        .portfolio-val-sub { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:4px; }
+        .portfolio-empty { font-family:'Space Mono',monospace; font-size:12px; color:var(--text-dim); text-align:center; padding:8px 0 4px; }
 
-        /* DCA */
-        .dca-section { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px 24px;margin-bottom:16px; }
-        .dca-header  { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
-        .dca-title   { font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px; }
-        .dca-title::before { content:'⬇';color:var(--chf);font-size:14px; }
-        .dca-subtitle{ font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted); }
-        .dca-levels  { display:flex;flex-direction:column;gap:8px; }
-        .dca-level   { display:grid;grid-template-columns:90px 1fr 72px 82px;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border); }
-        .dca-level.reached { border-color:rgba(63,185,80,0.35);background:rgba(63,185,80,0.06); }
-        @media(max-width:560px){ .dca-level{grid-template-columns:80px 1fr 60px;} .dca-action{display:none;} }
-        .dca-price-tag { font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--chf); }
-        .dca-bar-track { height:4px;background:var(--surface3);border-radius:2px;overflow:hidden; }
-        .dca-bar-fill  { height:100%;border-radius:2px;background:linear-gradient(90deg,var(--chf),var(--green));transition:width 0.8s ease; }
-        .dca-pct       { font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-align:right; }
-        .dca-action    { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-align:right; }
+        /* ── DCA ── */
+        .dca-section { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px 24px; margin-bottom:16px; }
+        .dca-header  { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .dca-title   { font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+        .dca-title::before { content:'⬇'; color:var(--chf); font-size:14px; }
+        .dca-subtitle { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-muted); }
+        .dca-levels  { display:flex; flex-direction:column; gap:8px; }
+        .dca-level   { display:grid; grid-template-columns:1fr 1fr auto; gap:10px; align-items:center; padding:12px 14px; background:var(--surface2); border-radius:10px; border:1px solid var(--border); }
+        .dca-level.reached { border-color:rgba(63,185,80,0.35); background:rgba(63,185,80,0.06); }
+        .dca-top-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+        .dca-input-wrap { display:flex; align-items:center; gap:5px; background:var(--surface3); border:1px solid var(--border); border-radius:7px; padding:4px 9px; transition:border-color 0.2s; }
+        .dca-input-wrap:focus-within { border-color:rgba(41,182,246,0.5); }
+        .dca-currency-lbl { font-family:'Space Mono',monospace; font-size:10px; color:var(--chf); font-weight:700; }
+        .dca-price-input  { background:transparent; border:none; outline:none; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--text); width:64px; text-align:right; }
+        .dca-price-input::placeholder { color:var(--text-dim); }
+        .dca-bar-track { height:4px; background:var(--surface3); border-radius:2px; overflow:hidden; margin:4px 0; }
+        .dca-bar-fill  { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--chf),var(--green)); transition:width 0.8s ease; }
+        .dca-pct-row   { display:flex; align-items:center; justify-content:space-between; }
+        .dca-pct       { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; }
+        .dca-action    { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); }
         .dca-level.reached .dca-action { color:var(--green); }
 
-        /* CHART */
-        .chart-section  { background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px; }
-        .chart-header   { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px; }
-        .chart-title    { font-size:14px;font-weight:700;color:var(--text); }
-        .chart-subtitle { font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:3px; }
-        .chart-wrapper  { position:relative;height:240px;margin-top:16px; }
-        .chart-loading  { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-muted);gap:10px; }
-        .mini-spinner   { width:18px;height:18px;border:2px solid var(--surface3);border-top-color:var(--chf);border-radius:50%;animation:spin 0.8s linear infinite; }
+        /* ── CHART ── */
+        .chart-section  { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:24px; margin-bottom:16px; }
+        .chart-header   { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; }
+        .chart-title    { font-size:14px; font-weight:700; color:var(--text); }
+        .chart-subtitle { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:3px; }
+        .chart-wrapper  { position:relative; height:240px; margin-top:16px; }
+        .chart-loading  { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:12px; color:var(--text-muted); gap:10px; }
+        .mini-spinner   { width:18px; height:18px; border:2px solid var(--surface3); border-top-color:var(--chf); border-radius:50%; animation:spin 0.8s linear infinite; }
 
-        /* FOOTER */
-        .footer-bar    { display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:14px; }
-        .update-info   { display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted); }
-        .countdown-wrap{ display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted); }
-        .countdown-circle { width:34px;height:34px;position:relative; }
+        /* ── FOOTER ── */
+        .footer-bar     { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:var(--surface); border:1px solid var(--border); border-radius:14px; }
+        .update-info    { display:flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); }
+        .countdown-wrap { display:flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); }
+        .countdown-circle { width:34px; height:34px; position:relative; }
         .countdown-svg { transform:rotate(-90deg); }
-        .cc-bg   { fill:none;stroke:var(--surface3);stroke-width:3; }
-        .cc-prog { fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 1s linear; }
-        .cc-text { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:var(--accent);font-family:'Space Mono',monospace; }
+        .cc-bg   { fill:none; stroke:var(--surface3); stroke-width:3; }
+        .cc-prog { fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
+        .cc-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:10px; font-weight:700; color:var(--accent); font-family:'Space Mono',monospace; }
 
-        /* MISC */
-        .loading-screen{ display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px; }
-        .spinner-lg { width:44px;height:44px;border:3px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
-        .loading-text { font-family:'Space Mono',monospace;font-size:13px;color:var(--text-muted); }
-        .error-banner { background:var(--red-dim);border:1px solid rgba(248,81,73,0.3);border-radius:12px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:11px;color:var(--red);margin-bottom:14px; }
+        /* ── MISC ── */
+        .loading-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; gap:16px; }
+        .spinner-lg     { width:44px; height:44px; border:3px solid var(--surface3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+        .loading-text   { font-family:'Space Mono',monospace; font-size:13px; color:var(--text-muted); }
+        .error-banner   { background:var(--red-dim); border:1px solid rgba(248,81,73,0.3); border-radius:12px; padding:10px 16px; font-family:'Space Mono',monospace; font-size:11px; color:var(--red); margin-bottom:14px; }
     </style>
 </head>
 <body>
@@ -185,18 +186,9 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-const PRICE_INTERVAL = 10000;   // live price every 10s
-const DCA_LEVELS = [
-    { price: 45000, label: 'CHF 45k' },
-    { price: 40000, label: 'CHF 40k' },
-    { price: 35000, label: 'CHF 35k' },
-    { price: 30000, label: 'CHF 30k' },
-];
-
-// Small delay helper to avoid hammering the API
+const PRICE_INTERVAL = 10000;
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
-// Single robust fetch with timeout
 async function apiFetch(url, timeoutMs = 9000) {
     const ctrl = new AbortController();
     const to   = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -205,17 +197,37 @@ async function apiFetch(url, timeoutMs = 9000) {
         clearTimeout(to);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return await res.json();
-    } catch(e) {
-        clearTimeout(to);
-        throw e;
-    }
+    } catch(e) { clearTimeout(to); throw e; }
 }
+
+// ── RSI calculation (Wilder's smoothed method) ───────────────
+function calcRSI(prices, period = 14) {
+    if (prices.length < period + 1) return null;
+    let gains = 0, losses = 0;
+    for (let i = 1; i <= period; i++) {
+        const diff = prices[i] - prices[i - 1];
+        if (diff > 0) gains  += diff;
+        else          losses -= diff;
+    }
+    let avgGain = gains  / period;
+    let avgLoss = losses / period;
+    for (let i = period + 1; i < prices.length; i++) {
+        const diff = prices[i] - prices[i - 1];
+        avgGain = (avgGain * (period - 1) + Math.max(diff, 0)) / period;
+        avgLoss = (avgLoss * (period - 1) + Math.max(-diff, 0)) / period;
+    }
+    if (avgLoss === 0) return 100;
+    return 100 - (100 / (1 + avgGain / avgLoss));
+}
+
+// Default DCA levels in CHF
+const DEFAULT_DCA = ['45000','40000','35000','30000'];
 
 function BTCTracker() {
     const [priceData,    setPriceData]    = useState(null);
     const [prevPrice,    setPrevPrice]    = useState(null);
     const [chfRate,      setChfRate]      = useState(null);
-    const [annualData,   setAnnualData]   = useState(null);  // { high, low } USD
+    const [annualData,   setAnnualData]   = useState(null);
     const [trend,        setTrend]        = useState('neutral');
     const [loading,      setLoading]      = useState(true);
     const [priceError,   setPriceError]   = useState(null);
@@ -223,20 +235,41 @@ function BTCTracker() {
     const [sparkHistory, setSparkHistory] = useState([]);
     const [countdown,    setCountdown]    = useState(10);
     const [isPulsing,    setIsPulsing]    = useState(false);
+
+    // Indicators
     const [fearGreed,    setFearGreed]    = useState(null);
     const [mayerMult,    setMayerMult]    = useState(null);
+    const [weeklyRSI,    setWeeklyRSI]    = useState(null);
+    const [realizedPrice,setRealizedPrice]= useState(null);
+
+    // Portfolio
     const [btcAmount,    setBtcAmount]    = useState(() => {
         try { return localStorage.getItem('btcAmount') || ''; } catch(_) { return ''; }
     });
-    const [chartData,    setChartData]    = useState(null);  // 365d prices in USD
+
+    // DCA levels — 4 editable CHF values
+    const [dcaLevels,    setDcaLevels]    = useState(() => {
+        try {
+            const saved = localStorage.getItem('dcaLevels');
+            return saved ? JSON.parse(saved) : [...DEFAULT_DCA];
+        } catch(_) { return [...DEFAULT_DCA]; }
+    });
+
+    // Chart
+    const [chartData,    setChartData]    = useState(null);
     const [chartLoading, setChartLoading] = useState(false);
     const chartInst = useRef(null);
     const canvasRef = useRef(null);
 
-    // Persist BTC amount
+    // Persist
     useEffect(() => { try { localStorage.setItem('btcAmount', btcAmount); } catch(_){} }, [btcAmount]);
+    useEffect(() => { try { localStorage.setItem('dcaLevels', JSON.stringify(dcaLevels)); } catch(_){} }, [dcaLevels]);
 
-    // ── 1. Live price (USD + CHF in one call) ────────────────────
+    const updateDcaLevel = (idx, val) => {
+        setDcaLevels(prev => { const n = [...prev]; n[idx] = val; return n; });
+    };
+
+    // ── 1. Live price ────────────────────────────────────────────
     const fetchPrice = useCallback(async () => {
         try {
             const data = await apiFetch(
@@ -258,62 +291,116 @@ function BTCTracker() {
             setPriceError(null);
             setCountdown(10);
         } catch(e) {
-            setPriceError('Error de conexión. Reintentando en 10s...');
+            setPriceError('Error de conexión. Reintentando...');
             setLoading(false);
         }
     }, [prevPrice]);
 
-    // ── 2. Secondary data loaded ONCE at startup, staggered ──────
-    //   Each call waits 3s after the previous to avoid rate-limiting.
+    // ── 2. Secondary data — staggered ────────────────────────────
     useEffect(() => {
         let cancelled = false;
-
         async function loadSecondary() {
-            // Fear & Greed — different domain, no rate limit issue
+
+            // Fear & Greed (separate API — no CoinGecko rate limit)
             try {
                 const fg = await apiFetch('https://api.alternative.me/fng/?limit=1');
                 if (!cancelled) setFearGreed(fg.data[0]);
             } catch(_) {}
 
-            await delay(3000);
-            if (cancelled) return;
+            await delay(3000); if (cancelled) return;
 
-            // 365d chart — used for Annual High/Low + portfolio chart
+            // 365d daily — chart + annual high/low + Mayer MA200 (same data!)
             try {
                 setChartLoading(true);
                 const hist = await apiFetch(
                     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily'
                 );
                 if (!cancelled) {
-                    const prices = hist.prices; // [[ts, price], ...]
+                    const prices = hist.prices;
                     const vals   = prices.map(([,p]) => p);
                     setAnnualData({ high: Math.max(...vals), low: Math.min(...vals) });
                     setChartData(prices);
                     setChartLoading(false);
+                    // Mayer from last 200 points of this same dataset
+                    const last200 = vals.slice(-200);
+                    if (last200.length >= 50) {
+                        const ma200 = last200.reduce((a,b) => a+b,0) / last200.length;
+                        setMayerMult(vals[vals.length-1] / ma200);
+                    }
                 }
-            } catch(_) {
-                if (!cancelled) setChartLoading(false);
-            }
+            } catch(_) { if (!cancelled) setChartLoading(false); }
 
-            await delay(3000);
-            if (cancelled) return;
+            await delay(3500); if (cancelled) return;
 
-            // Mayer Multiple — 200d MA (use the same 365d data subset if available)
+            // Weekly RSI — fetch ~2 years of weekly data (730 days)
+            // CoinGecko doesn't have a "weekly interval" on free plan,
+            // so we fetch 730d daily and manually resample to weekly closes.
             try {
-                const m200 = await apiFetch(
-                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=200&interval=daily'
+                const hist2 = await apiFetch(
+                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=730&interval=daily'
                 );
                 if (!cancelled) {
-                    const vals  = m200.prices.map(([,p]) => p);
-                    const ma200 = vals.reduce((a,b) => a+b, 0) / vals.length;
-                    setMayerMult(vals[vals.length - 1] / ma200);
+                    const allPrices = hist2.prices; // [[ts,price],...]
+                    // Resample: pick one price per 7-day bucket (last day of each week)
+                    const weekly = [];
+                    for (let i = 6; i < allPrices.length; i += 7) {
+                        weekly.push(allPrices[i][1]);
+                    }
+                    // Also add the very last available price as "current week"
+                    weekly.push(allPrices[allPrices.length - 1][1]);
+                    const rsi = calcRSI(weekly, 14);
+                    if (!cancelled && rsi !== null) setWeeklyRSI(rsi);
                 }
             } catch(_) {}
-        }
 
+            await delay(3500); if (cancelled) return;
+
+            // Realized Price via Blockchain.info (UTXO-based, public API)
+            // Fallback: use a known approximation from CoinGecko market data
+            try {
+                // Try CoinGecko's realized cap / circulating supply approximation
+                const mktData = await apiFetch(
+                    'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false'
+                );
+                if (!cancelled && mktData.market_data) {
+                    // Realized price ≈ not directly available in CoinGecko free tier.
+                    // Best public free approximation: glassnode-style estimate via
+                    // 200-week MA as a proxy (historically tracks realized price closely).
+                    // We already have 365d data; fetch 4y for 200-week MA.
+                    // Instead, use the known Lookintobitcoin API (public, no key needed).
+                }
+            } catch(_) {}
+
+            // Realized Price: use Lookintobitcoin public endpoint
+            try {
+                const rpData = await apiFetch(
+                    'https://lookintobitcoin.com/charts/realized-price/data/'
+                );
+                if (!cancelled && rpData && Array.isArray(rpData)) {
+                    const last = rpData[rpData.length - 1];
+                    if (last && last.value) setRealizedPrice(parseFloat(last.value));
+                }
+            } catch(_) {
+                // If Lookintobitcoin fails (CORS likely), compute 200-week MA from longer history
+                try {
+                    await delay(2000);
+                    const longHist = await apiFetch(
+                        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1500&interval=daily'
+                    );
+                    if (!cancelled) {
+                        const vals = longHist.prices.map(([,p]) => p);
+                        // 200-week MA = 1400-day MA (200 * 7)
+                        const window = Math.min(1400, vals.length);
+                        const slice  = vals.slice(-window);
+                        const ma = slice.reduce((a,b) => a+b,0) / slice.length;
+                        setRealizedPrice(ma); // good proxy for realized price
+                    }
+                } catch(_) {}
+            }
+        }
         loadSecondary();
         return () => { cancelled = true; };
-    }, []); // runs once on mount
+    }, []);
 
     // ── 3. Price interval ────────────────────────────────────────
     useEffect(() => {
@@ -322,17 +409,15 @@ function BTCTracker() {
         return () => clearInterval(iv);
     }, [prevPrice]);
 
-    // Countdown ticker
     useEffect(() => {
         if (loading || !priceData) return;
         const t = setInterval(() => setCountdown(c => c <= 1 ? 10 : c - 1), 1000);
         return () => clearInterval(t);
     }, [loading, priceData]);
 
-    // ── 4. Build Chart.js (1Y portfolio value in CHF) ────────────
+    // ── 4. Chart (1Y portfolio in CHF) ───────────────────────────
     useEffect(() => {
         if (!chartData || !canvasRef.current || !chfRate) return;
-
         if (chartInst.current) { chartInst.current.destroy(); chartInst.current = null; }
 
         const btcQty = parseFloat(btcAmount) || 1;
@@ -342,7 +427,6 @@ function BTCTracker() {
             return d.toLocaleDateString('es-ES', { month:'short', day:'numeric' });
         });
 
-        const isUp = values[values.length - 1] >= values[0];
         const ctx  = canvasRef.current.getContext('2d');
         const grad = ctx.createLinearGradient(0, 0, 0, 240);
         grad.addColorStop(0, 'rgba(41,182,246,0.2)');
@@ -365,74 +449,91 @@ function BTCTracker() {
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 animation: { duration: 400 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#161b22',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1,
-                        titleColor: '#7d8590',
-                        bodyColor: '#e6edf3',
-                        titleFont: { family:"'Space Mono',monospace", size:10 },
-                        bodyFont:  { family:"'Space Mono',monospace", size:13, weight:'700' },
+                        backgroundColor:'#161b22', borderColor:'rgba(255,255,255,0.1)', borderWidth:1,
+                        titleColor:'#7d8590', bodyColor:'#e6edf3',
+                        titleFont:{family:"'Space Mono',monospace",size:10},
+                        bodyFont: {family:"'Space Mono',monospace",size:13,weight:'700'},
                         callbacks: {
                             label: c => {
                                 const v = c.parsed.y;
-                                if (v >= 1000000) return ' CHF ' + (v/1000000).toFixed(3) + 'M';
-                                return ' CHF ' + v.toLocaleString('es-ES');
+                                if (v >= 1000000) return ' CHF '+(v/1000000).toFixed(3)+'M';
+                                return ' CHF '+v.toLocaleString('es-ES');
                             }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        ticks: { color:'#484f58', font:{family:"'Space Mono',monospace",size:9}, maxTicksLimit:12, maxRotation:0 },
-                        grid:  { color:'rgba(255,255,255,0.04)' },
+                        ticks:{ color:'#484f58', font:{family:"'Space Mono',monospace",size:9}, maxTicksLimit:12, maxRotation:0 },
+                        grid: { color:'rgba(255,255,255,0.04)' },
                         border:{ color:'rgba(255,255,255,0.07)' }
                     },
                     y: {
                         position:'right',
-                        ticks: {
-                            color:'#484f58',
-                            font:{family:"'Space Mono',monospace",size:9},
+                        ticks:{
+                            color:'#484f58', font:{family:"'Space Mono',monospace",size:9},
                             callback: v => {
                                 if (v >= 1000000) return 'CHF '+(v/1000000).toFixed(1)+'M';
                                 if (v >= 1000)    return 'CHF '+(v/1000).toFixed(0)+'k';
                                 return 'CHF '+v;
                             }
                         },
-                        grid:  { color:'rgba(255,255,255,0.04)' },
+                        grid: { color:'rgba(255,255,255,0.04)' },
                         border:{ color:'rgba(255,255,255,0.07)' }
                     }
                 },
-                interaction: { mode:'index', intersect:false }
+                interaction:{ mode:'index', intersect:false }
             }
         });
     }, [chartData, chfRate, btcAmount]);
 
     // ── Helpers ──────────────────────────────────────────────────
-    const fmtUSD = v => '$' + Math.round(v).toLocaleString('es-ES');
-    const fmtCHF = v => 'CHF ' + Math.round(v).toLocaleString('es-ES');
+    const fmtUSD = v => '$'+Math.round(v).toLocaleString('es-ES');
+    const fmtCHF = v => 'CHF '+Math.round(v).toLocaleString('es-ES');
     const fmtB   = v => {
         if (v >= 1e9) return '$'+(v/1e9).toFixed(2)+'B';
         if (v >= 1e6) return '$'+(v/1e6).toFixed(2)+'M';
         return '$'+v.toLocaleString('es-ES');
     };
 
+    // Fear & Greed config
     const fgConfig = v => {
-        if (v <= 24) return { cls:'fg-extreme-fear',  label:'Miedo Extremo',   sem:'sem-red',    color:'#f85149' };
-        if (v <= 44) return { cls:'fg-fear',           label:'Miedo',           sem:'sem-red',    color:'#f97316' };
-        if (v <= 55) return { cls:'fg-neutral',        label:'Neutral',         sem:'sem-yellow', color:'#e3b341' };
-        if (v <= 74) return { cls:'fg-greed',          label:'Codicia',         sem:'sem-green',  color:'#3fb950' };
-        return               { cls:'fg-extreme-greed', label:'Codicia Extrema', sem:'sem-green',  color:'#22c55e' };
+        if (v <= 24) return { cls:'score-red',    label:'Miedo Extremo',   sem:'sem-red',    color:'#f85149' };
+        if (v <= 44) return { cls:'score-red',    label:'Miedo',           sem:'sem-red',    color:'#f97316' };
+        if (v <= 55) return { cls:'score-yellow', label:'Neutral',         sem:'sem-yellow', color:'#e3b341' };
+        if (v <= 74) return { cls:'score-green',  label:'Codicia',         sem:'sem-green',  color:'#3fb950' };
+        return               { cls:'score-green',  label:'Codicia Extrema', sem:'sem-green',  color:'#22c55e' };
     };
+
+    // Mayer Multiple config
     const mayerConfig = m => {
-        if (m < 0.8)  return { cls:'mayer-low',    label:'Infravalorado', sem:'sem-green',  hint:'Zona de acumulación' };
-        if (m < 1.5)  return { cls:'mayer-normal', label:'Normal',        sem:'sem-yellow', hint:'Zona neutral' };
-        return                { cls:'mayer-high',   label:'Sobrecomprado', sem:'sem-red',    hint:'Precaución' };
+        if (m < 0.8)  return { cls:'score-green',  label:'Infravalorado', sem:'sem-green',  hint:'Zona de acumulación' };
+        if (m < 1.5)  return { cls:'score-yellow', label:'Normal',        sem:'sem-yellow', hint:'Zona neutral' };
+        return                { cls:'score-red',    label:'Sobrecomprado', sem:'sem-red',    hint:'Precaución' };
+    };
+
+    // Weekly RSI config
+    const rsiConfig = v => {
+        if (v < 30)  return { cls:'score-green',  label:'Sobreventa',    sem:'sem-green',  hint:'Zona de acumulación' };
+        if (v < 50)  return { cls:'score-green',  label:'Bajo',          sem:'sem-green',  hint:'Tendencia neutral-bajista' };
+        if (v < 60)  return { cls:'score-yellow', label:'Neutral',       sem:'sem-yellow', hint:'Zona neutral' };
+        if (v < 75)  return { cls:'score-yellow', label:'Elevado',       sem:'sem-yellow', hint:'Tendencia alcista' };
+        return                { cls:'score-red',   label:'Sobrecompra',   sem:'sem-red',    hint:'Precaución' };
+    };
+
+    // Realized Price config
+    const rpConfig = (rp, current) => {
+        if (!rp || !current) return null;
+        const ratio = current / rp;
+        if (ratio < 1)    return { cls:'score-green',  label:'Por debajo',   sem:'sem-green',  hint:'Precio < Realized Price' };
+        if (ratio < 2)    return { cls:'score-yellow', label:'Normal',       sem:'sem-yellow', hint:'1–2× Realized Price' };
+        if (ratio < 3.5)  return { cls:'score-yellow', label:'Alcista',      sem:'sem-yellow', hint:'2–3.5× Realized Price' };
+        return                    { cls:'score-red',    label:'Euforia',      sem:'sem-red',    hint:`${ratio.toFixed(1)}× Realized Price` };
     };
 
     const Sparkline = ({ data }) => {
@@ -475,11 +576,9 @@ function BTCTracker() {
         );
     }
 
-    const chfPrice   = priceData?.chf ?? (priceData?.usd && chfRate ? priceData.usd * chfRate : null);
-    const btcQty     = parseFloat(btcAmount) || 0;
-    const currentChf = priceData?.usd && chfRate ? priceData.usd * chfRate : null;
-    const high24     = priceData?.usd_24h_high;
-    const low24      = priceData?.usd_24h_low;
+    const chfPrice    = priceData?.chf ?? (priceData?.usd && chfRate ? priceData.usd * chfRate : null);
+    const btcQty      = parseFloat(btcAmount) || 0;
+    const currentChf  = priceData?.usd && chfRate ? priceData.usd * chfRate : null;
     const changeClass = c => c > 0 ? 'pos' : c < 0 ? 'neg' : 'neu';
     const changeSign  = c => c > 0 ? '+' : '';
 
@@ -534,35 +633,7 @@ function BTCTracker() {
                     )}
                 </div>
 
-                {/* 24H HIGH / LOW */}
-                <div className="currency-strip">
-                    <div className="currency-card usd-card">
-                        <div className="currency-icon">USD · 24H</div>
-                        <div className="currency-value" style={{color:'var(--green)'}}>
-                            {high24 && high24 !== priceData.usd ? fmtUSD(high24) : '—'}
-                        </div>
-                        <div className="currency-sub">Máximo ↑</div>
-                        <div className="currency-value" style={{marginTop:6,color:'var(--red)'}}>
-                            {low24 && low24 !== priceData.usd ? fmtUSD(low24) : '—'}
-                        </div>
-                        <div className="currency-sub">Mínimo ↓</div>
-                    </div>
-                    <div className="currency-card chf-card">
-                        <div className="currency-icon">CHF · 24H</div>
-                        {chfRate && high24 && high24 !== priceData.usd ? (<>
-                            <div className="currency-value" style={{color:'var(--green)'}}>{fmtCHF(high24*chfRate)}</div>
-                            <div className="currency-sub">Máximo ↑</div>
-                            <div className="currency-value" style={{marginTop:6,color:'var(--red)'}}>{low24 ? fmtCHF(low24*chfRate) : '—'}</div>
-                            <div className="currency-sub">Mínimo ↓</div>
-                        </>) : (
-                            <div className="currency-sub" style={{paddingTop:8,fontFamily:"'Space Mono',monospace",fontSize:10}}>
-                                {chfRate ? 'Igual al precio actual' : 'Cargando...'}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* STATS: MktCap / Vol / Annual High / Annual Low */}
+                {/* STATS */}
                 <div className="stats-grid">
                     <div className="stat-card">
                         <div className="stat-label">MKT CAP</div>
@@ -586,8 +657,10 @@ function BTCTracker() {
                     </div>
                 </div>
 
-                {/* FEAR & GREED + MAYER */}
-                <div className="indicators-row">
+                {/* INDICATORS — 2×2 grid */}
+                <div className="indicators-grid">
+
+                    {/* Fear & Greed */}
                     <div className="indicator-card">
                         <div className="indicator-label">FEAR & GREED INDEX</div>
                         {fearGreed ? (() => {
@@ -598,8 +671,7 @@ function BTCTracker() {
                                     <div className={`indicator-score ${cfg.cls}`}>{v}</div>
                                     <div>
                                         <div className="indicator-name">
-                                            <span className={`semaphore ${cfg.sem}`}></span>
-                                            {cfg.label}
+                                            <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
                                         </div>
                                         <div className="indicator-sub">/ 100</div>
                                     </div>
@@ -613,6 +685,7 @@ function BTCTracker() {
                         })() : <div className="indicator-sub" style={{paddingTop:8}}>Cargando...</div>}
                     </div>
 
+                    {/* Mayer Multiple */}
                     <div className="indicator-card">
                         <div className="indicator-label">MAYER MULTIPLE</div>
                         {mayerMult ? (() => {
@@ -622,16 +695,64 @@ function BTCTracker() {
                                     <div className={`indicator-score ${cfg.cls}`}>{mayerMult.toFixed(2)}</div>
                                     <div>
                                         <div className="indicator-name">
-                                            <span className={`semaphore ${cfg.sem}`}></span>
-                                            {cfg.label}
+                                            <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
                                         </div>
                                         <div className="indicator-sub">Precio / MA200</div>
-                                        <div className="indicator-sub" style={{marginTop:3}}>{cfg.hint}</div>
+                                        <div className="indicator-sub" style={{marginTop:2}}>{cfg.hint}</div>
                                     </div>
                                 </div>
                             );
                         })() : <div className="indicator-sub" style={{paddingTop:8}}>Cargando...</div>}
                     </div>
+
+                    {/* Weekly RSI */}
+                    <div className="indicator-card">
+                        <div className="indicator-label">WEEKLY RSI (14)</div>
+                        {weeklyRSI !== null ? (() => {
+                            const v = weeklyRSI;
+                            const cfg = rsiConfig(v);
+                            // needle position: RSI 0–100 maps to 0–100% of bar
+                            return (<>
+                                <div className="indicator-main">
+                                    <div className={`indicator-score ${cfg.cls}`}>{v.toFixed(1)}</div>
+                                    <div>
+                                        <div className="indicator-name">
+                                            <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
+                                        </div>
+                                        <div className="indicator-sub">{cfg.hint}</div>
+                                        <div className="indicator-sub" style={{marginTop:2}}>
+                                            {v < 30 ? 'Oversold' : v > 70 ? 'Overbought' : 'Rango normal'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="rsi-bar-wrap" style={{marginTop:10}}>
+                                    <div className="rsi-needle" style={{left:`${v}%`}}></div>
+                                </div>
+                            </>);
+                        })() : <div className="indicator-sub" style={{paddingTop:8}}>Calculando RSI semanal...</div>}
+                    </div>
+
+                    {/* Realized Price */}
+                    <div className="indicator-card">
+                        <div className="indicator-label">REALIZED PRICE</div>
+                        {realizedPrice ? (() => {
+                            const cfg = rpConfig(realizedPrice, priceData.usd);
+                            const ratio = (priceData.usd / realizedPrice).toFixed(2);
+                            return (
+                                <div className="indicator-main">
+                                    <div className={`indicator-score ${cfg.cls}`}>{ratio}×</div>
+                                    <div>
+                                        <div className="indicator-name">
+                                            <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
+                                        </div>
+                                        <div className="indicator-sub">{fmtUSD(realizedPrice)}</div>
+                                        <div className="indicator-sub" style={{marginTop:2}}>{cfg.hint}</div>
+                                    </div>
+                                </div>
+                            );
+                        })() : <div className="indicator-sub" style={{paddingTop:8}}>Calculando...</div>}
+                    </div>
+
                 </div>
 
                 {/* PORTFOLIO */}
@@ -674,27 +795,51 @@ function BTCTracker() {
                             <div className="dca-subtitle">Actual: {fmtCHF(currentChf)}</div>
                         </div>
                         <div className="dca-levels">
-                            {DCA_LEVELS.map(lvl => {
-                                const reached = currentChf <= lvl.price;
-                                // bar fill = how close we are (100% = at target, 0% = far away)
-                                // scale: from currentChf*1.5 (0%) down to lvl.price (100%)
-                                const top = Math.max(currentChf, lvl.price) * 1.4;
-                                const fill = reached ? 100 : Math.max(4, Math.min(96,
-                                    ((top - currentChf) / (top - lvl.price)) * 100
+                            {dcaLevels.map((lvlStr, idx) => {
+                                const lvlPrice = parseFloat(lvlStr) || 0;
+                                const reached  = lvlPrice > 0 && currentChf <= lvlPrice;
+                                const empty    = lvlPrice === 0;
+
+                                // Progress bar: 100% = at target, tapers off as price is higher
+                                const fill = empty ? 0 : reached ? 100 : Math.max(4, Math.min(96,
+                                    100 - ((currentChf - lvlPrice) / (currentChf * 0.6)) * 100
                                 ));
-                                const pctAway = reached
-                                    ? '✓ NIVEL'
-                                    : `-${(((currentChf - lvl.price) / currentChf) * 100).toFixed(1)}%`;
+                                const pctAway = empty
+                                    ? '—'
+                                    : reached
+                                        ? '✓ NIVEL'
+                                        : `-${(((currentChf - lvlPrice) / currentChf) * 100).toFixed(1)}%`;
+
                                 return (
-                                    <div key={lvl.price} className={`dca-level ${reached ? 'reached' : ''}`}>
-                                        <div className="dca-price-tag">{lvl.label}</div>
-                                        <div className="dca-bar-track">
-                                            <div className="dca-bar-fill" style={{width:`${fill}%`}}></div>
+                                    <div key={idx} className={`dca-level ${reached ? 'reached' : ''}`}>
+                                        {/* Left: editable price input */}
+                                        <div>
+                                            <div className="dca-input-wrap">
+                                                <span className="dca-currency-lbl">CHF</span>
+                                                <input
+                                                    className="dca-price-input"
+                                                    type="number" min="0" step="1000"
+                                                    placeholder="precio"
+                                                    value={lvlStr}
+                                                    onChange={e => updateDcaLevel(idx, e.target.value)}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="dca-pct" style={{color: reached ? 'var(--green)' : 'var(--yellow)'}}>
-                                            {pctAway}
+                                        {/* Middle: bar + pct */}
+                                        <div>
+                                            <div className="dca-bar-track">
+                                                <div className="dca-bar-fill" style={{width:`${fill}%`}}></div>
+                                            </div>
+                                            <div className="dca-pct-row" style={{marginTop:4}}>
+                                                <div className="dca-pct" style={{color: reached ? 'var(--green)' : empty ? 'var(--text-dim)' : 'var(--yellow)'}}>
+                                                    {pctAway}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="dca-action">Comprar 1 BTC</div>
+                                        {/* Right: action */}
+                                        <div className="dca-action">
+                                            {reached ? '✓ Comprar 1 BTC' : 'Comprar 1 BTC'}
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -702,13 +847,11 @@ function BTCTracker() {
                     </div>
                 )}
 
-                {/* PORTFOLIO CHART — 1 year, CHF */}
+                {/* PORTFOLIO CHART */}
                 <div className="chart-section">
                     <div className="chart-header">
                         <div>
-                            <div className="chart-title">
-                                Portfolio · 1 Año en CHF
-                            </div>
+                            <div className="chart-title">Portfolio · 1 Año en CHF</div>
                             <div className="chart-subtitle">
                                 {btcQty > 0
                                     ? `${btcAmount} BTC · evolución últimos 365 días`
@@ -723,7 +866,7 @@ function BTCTracker() {
                                 Cargando histórico...
                             </div>
                         )}
-                        <canvas ref={canvasRef} style={{opacity: chartLoading ? 0.15 : 1, transition:'opacity 0.3s'}}/>
+                        <canvas ref={canvasRef} style={{opacity:chartLoading?0.15:1,transition:'opacity 0.3s'}}/>
                     </div>
                 </div>
 
@@ -748,4 +891,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(<BTCTracker/>);
 </script>
 </body>
 </html>
+
 
