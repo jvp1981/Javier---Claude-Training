@@ -179,6 +179,16 @@
         .spinner-lg     { width:44px; height:44px; border:3px solid var(--surface3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
         .loading-text   { font-family:'Space Mono',monospace; font-size:13px; color:var(--text-muted); }
         .error-banner   { background:var(--red-dim); border:1px solid rgba(248,81,73,0.3); border-radius:12px; padding:10px 16px; font-family:'Space Mono',monospace; font-size:11px; color:var(--red); margin-bottom:14px; }
+
+        /* ── REALIZED PRICE MANUAL EDIT ── */
+        .rp-value-row   { display:flex; align-items:center; justify-content:space-between; margin-bottom:2px; }
+        .rp-edit-btn    { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); background:var(--surface3); border:1px solid var(--border); border-radius:6px; padding:3px 8px; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+        .rp-edit-btn:hover { color:var(--chf); border-color:rgba(41,182,246,0.4); }
+        .rp-input-row   { display:flex; align-items:center; gap:6px; margin-top:8px; }
+        .rp-input       { flex:1; background:var(--surface3); border:1px solid rgba(41,182,246,0.4); border-radius:7px; padding:5px 9px; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--text); outline:none; }
+        .rp-save-btn    { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; color:#000; background:var(--chf); border:none; border-radius:7px; padding:5px 12px; cursor:pointer; }
+        .rp-updated     { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); margin-top:4px; }
+        .rp-empty       { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); padding-top:4px; }
     </style>
 </head>
 <body>
@@ -240,7 +250,14 @@ function BTCTracker() {
     const [fearGreed,    setFearGreed]    = useState(null);
     const [mayerMult,    setMayerMult]    = useState(null);
     const [weeklyRSI,    setWeeklyRSI]    = useState(null);
-    const [realizedPrice,setRealizedPrice]= useState(null);
+    const [realizedPrice,setRealizedPrice]= useState(() => {
+        try { return localStorage.getItem('realizedPrice') || ''; } catch(_) { return ''; }
+    });
+    const [rpUpdatedAt,  setRpUpdatedAt]  = useState(() => {
+        try { return localStorage.getItem('rpUpdatedAt') || ''; } catch(_) { return ''; }
+    });
+    const [rpEditing,    setRpEditing]    = useState(false);
+    const [rpDraft,      setRpDraft]      = useState('');
 
     // Portfolio
     const [btcAmount,    setBtcAmount]    = useState(() => {
@@ -264,6 +281,19 @@ function BTCTracker() {
     // Persist
     useEffect(() => { try { localStorage.setItem('btcAmount', btcAmount); } catch(_){} }, [btcAmount]);
     useEffect(() => { try { localStorage.setItem('dcaLevels', JSON.stringify(dcaLevels)); } catch(_){} }, [dcaLevels]);
+    useEffect(() => { try { localStorage.setItem('realizedPrice', realizedPrice); } catch(_){} }, [realizedPrice]);
+    useEffect(() => { try { localStorage.setItem('rpUpdatedAt', rpUpdatedAt); } catch(_){} }, [rpUpdatedAt]);
+
+    const saveRealizedPrice = () => {
+        const v = parseFloat(rpDraft.replace(/[^0-9.]/g, ''));
+        if (v > 0) {
+            setRealizedPrice(String(Math.round(v)));
+            const now = new Date().toLocaleDateString('es-ES', {day:'2-digit',month:'short',year:'numeric'});
+            setRpUpdatedAt(now);
+        }
+        setRpEditing(false);
+        setRpDraft('');
+    };
 
     const updateDcaLevel = (idx, val) => {
         setDcaLevels(prev => { const n = [...prev]; n[idx] = val; return n; });
@@ -338,23 +368,7 @@ function BTCTracker() {
                 }
             } catch(_) { if (!cancelled) setChartLoading(false); }
 
-            await delay(4000); if (cancelled) return;
 
-            // Call C: 1400d daily → 200-week SMA = best free proxy for Realized Price
-            // The 200-week MA (~$54k today) tracks on-chain realized price very closely
-            // and is used by analysts (e.g. PlanB, Glassnode breakdowns) as a public proxy.
-            try {
-                const longHist = await apiFetch(
-                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily'
-                );
-                if (!cancelled) {
-                    const vals = longHist.prices.map(([,p]) => p);
-                    // 200-week MA = last 1400 daily closes (200 × 7 = 1400)
-                    const slice = vals.slice(-1400);
-                    const ma200w = slice.reduce((a,b) => a+b, 0) / slice.length;
-                    setRealizedPrice(ma200w);
-                }
-            } catch(_) {}
         }
         loadSecondary();
         return () => { cancelled = true; };
@@ -690,25 +704,62 @@ function BTCTracker() {
                         })() : <div className="indicator-sub" style={{paddingTop:8}}>Calculando RSI semanal...</div>}
                     </div>
 
-                    {/* Realized Price */}
+                    {/* Realized Price — manual entry */}
                     <div className="indicator-card">
                         <div className="indicator-label">REALIZED PRICE</div>
-                        {realizedPrice ? (() => {
-                            const cfg = rpConfig(realizedPrice, priceData.usd);
-                            const ratio = (priceData.usd / realizedPrice).toFixed(2);
-                            return (
-                                <div className="indicator-main">
-                                    <div className={`indicator-score ${cfg.cls}`}>{ratio}×</div>
-                                    <div>
-                                        <div className="indicator-name">
-                                            <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
+                        {(() => {
+                            const rpVal = parseFloat(realizedPrice);
+                            if (rpVal > 0 && !rpEditing) {
+                                const cfg   = rpConfig(rpVal, priceData.usd);
+                                const ratio = (priceData.usd / rpVal).toFixed(2);
+                                return (<>
+                                    <div className="indicator-main">
+                                        <div className={`indicator-score ${cfg.cls}`}>{ratio}×</div>
+                                        <div style={{flex:1}}>
+                                            <div className="rp-value-row">
+                                                <div className="indicator-name">
+                                                    <span className={`semaphore ${cfg.sem}`}></span>{cfg.label}
+                                                </div>
+                                                <button className="rp-edit-btn" onClick={() => { setRpDraft(realizedPrice); setRpEditing(true); }}>editar</button>
+                                            </div>
+                                            <div className="indicator-sub">{fmtUSD(rpVal)}</div>
                                         </div>
-                                        <div className="indicator-sub">{fmtUSD(realizedPrice)}</div>
-                                        <div className="indicator-sub" style={{marginTop:2}}>~MA 200 semanas</div>
                                     </div>
+                                    {rpUpdatedAt && <div className="rp-updated">actualizado: {rpUpdatedAt}</div>}
+                                </>);
+                            }
+                            if (rpEditing) {
+                                return (<>
+                                    <div className="rp-empty">Introduce el Realized Price actual en USD:</div>
+                                    <div className="rp-input-row">
+                                        <input
+                                            className="rp-input"
+                                            type="number" placeholder="54785"
+                                            value={rpDraft}
+                                            onChange={e => setRpDraft(e.target.value)}
+                                            onKeyDown={e => e.key === 'Enter' && saveRealizedPrice()}
+                                            autoFocus
+                                        />
+                                        <button className="rp-save-btn" onClick={saveRealizedPrice}>OK</button>
+                                    </div>
+                                    <div className="rp-updated" style={{marginTop:6}}>Fuente recomendada: MacroMicro / Glassnode</div>
+                                </>);
+                            }
+                            return (<>
+                                <div className="rp-empty">Sin datos · actualiza una vez al mes</div>
+                                <div className="rp-input-row">
+                                    <input
+                                        className="rp-input"
+                                        type="number" placeholder="54785"
+                                        value={rpDraft}
+                                        onChange={e => setRpDraft(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && saveRealizedPrice()}
+                                    />
+                                    <button className="rp-save-btn" onClick={saveRealizedPrice}>OK</button>
                                 </div>
-                            );
-                        })() : <div className="indicator-sub" style={{paddingTop:8}}>Calculando...</div>}
+                                <div className="rp-updated" style={{marginTop:6}}>Fuente: MacroMicro / Glassnode</div>
+                            </>);
+                        })()}
                     </div>
 
                 </div>
